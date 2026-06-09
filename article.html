@@ -59,6 +59,10 @@ h1{
 
 <div class="content" id="content"></div>
 
+<hr>
+
+<div id="navigation"></div>
+
 <script>
 
 const params = new URLSearchParams(window.location.search);
@@ -71,6 +75,20 @@ fetch("data/articles.json")
       const article = data.find(
           item => item.id === articleId
       );
+
+      const currentIndex = data.findIndex(
+    item => item.id === articleId
+);
+
+const previousArticle =
+    currentIndex < data.length - 1
+        ? data[currentIndex + 1]
+        : null;
+
+const nextArticle =
+    currentIndex > 0
+        ? data[currentIndex - 1]
+        : null;
 
       if(!article){
 
@@ -94,6 +112,35 @@ fetch("data/articles.json")
 
       document.getElementById("content").innerHTML =
         article.content;
+
+        let navHtml = "";
+
+if(previousArticle){
+
+    navHtml += `
+        <p>
+            ← 上一篇：
+            <a href="article.html?id=${previousArticle.id}">
+                ${previousArticle.title}
+            </a>
+        </p>
+    `;
+}
+
+if(nextArticle){
+
+    navHtml += `
+        <p>
+            → 下一篇
+            <a href="article.html?id=${nextArticle.id}">
+                ${nextArticle.title}
+            </a>
+        </p>
+    `;
+}
+
+document.getElementById("navigation").innerHTML =
+    navHtml;
 
   })
   .catch(error => {
