@@ -76,19 +76,7 @@ fetch("data/articles.json")
           item => item.id === articleId
       );
 
-      const currentIndex = data.findIndex(
-    item => item.id === articleId
-);
-
-const previousArticle =
-    currentIndex < data.length - 1
-        ? data[currentIndex + 1]
-        : null;
-
-const nextArticle =
-    currentIndex > 0
-        ? data[currentIndex - 1]
-        : null;
+      
 
       if(!article){
 
@@ -97,6 +85,31 @@ const nextArticle =
 
           return;
       }
+
+      const currentLabel =
+    article.labels.length > 0
+        ? article.labels[article.labels.length - 1]
+        : "";
+
+const sameLabelArticles =
+    data.filter(item =>
+        item.labels.includes(currentLabel)
+    );
+
+const currentIndex =
+    sameLabelArticles.findIndex(
+        item => item.id === articleId
+    );
+
+const previousArticle =
+    currentIndex < sameLabelArticles.length - 1
+        ? sameLabelArticles[currentIndex + 1]
+        : null;
+
+const nextArticle =
+    currentIndex > 0
+        ? sameLabelArticles[currentIndex - 1]
+        : null;
 
       document.title =
         article.title + " - 腾空世界观档案馆";
@@ -107,14 +120,24 @@ const nextArticle =
       document.getElementById("published").innerText =
         "发布日期：" + article.published;
 
-      document.getElementById("labels").innerHTML =
-        "标签：" + article.labels.join(" / ");
+      const labelLinks = article.labels.map(label =>
+    `<a href="label.html?name=${encodeURIComponent(label)}">${label}</a>`
+);
+
+document.getElementById("labels").innerHTML =
+    "标签：" + labelLinks.join(" / ");
 
       document.getElementById("content").innerHTML =
         article.content;
 
         let navHtml = "";
-
+navHtml += `
+    <p>
+        <a href="label.html?name=${encodeURIComponent(currentLabel)}">
+            ← 返回 ${currentLabel} 目录
+        </a>
+    </p>
+`;
 if(previousArticle){
 
     navHtml += `
@@ -131,7 +154,7 @@ if(nextArticle){
 
     navHtml += `
         <p>
-            → 下一篇
+            → 下一篇：
             <a href="article.html?id=${nextArticle.id}">
                 ${nextArticle.title}
             </a>
