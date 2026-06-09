@@ -2,7 +2,7 @@ import json
 import os
 from urllib.request import urlopen
 
-FEED_URL = "https://tengkongworld.blogspot.com/feeds/posts/default?alt=json&max-results=500"
+FEED_URL = "https://tengkongworld.blogspot.com/feeds/posts/default?alt=json&max-results=999"
 OUTPUT_FILE = "data/articles.json"
 
 print("正在读取 Blogger Feed...")
