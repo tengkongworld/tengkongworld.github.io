@@ -27,6 +27,45 @@
 </p>
 
 <hr>
+<hr>
+
+<h2>最新文章</h2>
+
+<div id="latest-posts">
+<p>正在加载文章...</p>
+</div>
+
+<script>
+fetch('data/articles.json')
+  .then(response => response.json())
+  .then(data => {
+
+    const container = document.getElementById('latest-posts');
+
+    const latest = data.slice(0, 20);
+
+    let html = '<ul>';
+
+    latest.forEach(article => {
+      html += `
+        <li>
+          <strong>${article.published}</strong>
+          -
+          ${article.title}
+        </li>
+      `;
+    });
+
+    html += '</ul>';
+
+    container.innerHTML = html;
+
+  })
+  .catch(error => {
+    document.getElementById('latest-posts').innerHTML =
+      '<p>文章加载失败。</p>';
+  });
+</script>
 
 <h2>网站建设中</h2>
 
