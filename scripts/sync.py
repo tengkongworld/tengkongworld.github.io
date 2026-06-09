@@ -2,44 +2,156 @@ import json
 import os
 from urllib.request import urlopen
 
-FEED_URL = "https://tengkongworld.blogspot.com/feeds/posts/default?alt=json&max-results=999"
 OUTPUT_FILE = "data/articles.json"
 
-print("正在读取 Blogger Feed...")
+PAGE_SIZE = 150
 
-with urlopen(FEED_URL) as response:
-    data = json.load(response)
+print("开始同步 Blogger 档案...")
 
-entries = data["feed"].get("entry", [])
 
-articles = []
+# =========================
+# 抓取全部分页
+# =========================
 
-for entry in entries:
-    article_id = entry["id"]["$t"].split("-")[-1]
+feed_articles = []
 
-    title = entry.get("title", {}).get("$t", "")
+start_index = 1
 
-    published = entry.get("published", {}).get("$t", "")[:10]
+while True:
 
-    labels = []
-    for category in entry.get("category", []):
-        labels.append(category.get("term", ""))
+    feed_url = (
+        "https://tengkongworld.blogspot.com/"
+        f"feeds/posts/default?alt=json"
+        f"&max-results={PAGE_SIZE}"
+        f"&start-index={start_index}"
+    )
 
-    content = entry.get("content", {}).get("$t", "")
+    print(f"读取第 {start_index} 篇开始的数据...")
 
-    articles.append({
-        "id": article_id,
-        "title": title,
-        "published": published,
-        "labels": labels,
-        "content": content
-    })
+    with urlopen(feed_url) as response:
+        data = json.load(response)
 
-os.makedirs("data", exist_ok=True)
+    entries = data["feed"].get("entry", [])
 
-with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
-    json.dump(articles, f, ensure_ascii=False, indent=2)
+    if not entries:
+        break
 
-print("Feed统计总数:", data["feed"]["openSearch$totalResults"]["$t"])
-print("实际读取数量:", len(articles))
-print("已生成:", OUTPUT_FILE)
+    print(f"本页读取 {len(entries)} 篇")
+
+    for entry in entries:
+
+        article_id = entry["id"]["$t"].split("-")[-1]
+
+        title = entry.get("title", {}).get("$t", "")
+
+        published = entry.get(
+            "published", {}
+        ).get("$t", "")[:10]
+
+        labels = []
+
+        for category in entry.get("category", []):
+            labels.append(
+                category.get("term", "")
+            )
+
+        content = entry.get(
+            "content", {}
+        ).get("$t", "")
+
+        feed_articles.append({
+            "id": article_id,
+            "title": title,
+            "published": published,
+            "labels": labels,
+            "content": content
+        })
+
+    start_index += PAGE_SIZE
+
+
+# =========================
+# 读取现有档案
+# =========================
+
+existing_articles = []
+
+if os.path.exists(OUTPUT_FILE):
+
+    try:
+
+        with open(
+            OUTPUT_FILE,
+            "r",
+            encoding="utf-8"
+        ) as f:
+
+            existing_articles = json.load(f)
+
+    except:
+
+        existing_articles = []
+
+
+# =========================
+# 合并
+# =========================
+
+articles_by_id = {}
+
+for article in existing_articles:
+
+    articles_by_id[
+        article["id"]
+    ] = article
+
+for article in feed_articles:
+
+    articles_by_id[
+        article["id"]
+    ] = article
+
+
+articles = list(
+    articles_by_id.values()
+)
+
+
+# =========================
+# 排序
+# =========================
+
+articles.sort(
+    key=lambda x: x["published"],
+    reverse=True
+)
+
+
+# =========================
+# 保存
+# =========================
+
+os.makedirs(
+    "data",
+    exist_ok=True
+)
+
+with open(
+    OUTPUT_FILE,
+    "w",
+    encoding="utf-8"
+) as f:
+
+    json.dump(
+        articles,
+        f,
+        ensure_ascii=False,
+        indent=2
+    )
+
+
+print()
+print("同步完成")
+print("Feed读取数量:", len(feed_articles))
+print("档案馆总数量:", len(articles))
+print("输出文件:", OUTPUT_FILE)
