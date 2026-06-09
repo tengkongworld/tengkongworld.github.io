@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>文章阅读 - 腾空世界观档案馆</title>
+
+<style>
+
+body{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+    font-family:Arial, Helvetica, sans-serif;
+    line-height:1.8;
+}
+
+h1{
+    margin-bottom:10px;
+}
+
+.meta{
+    color:#666;
+    margin-bottom:20px;
+}
+
+.labels{
+    margin-bottom:20px;
+}
+
+.content img{
+    max-width:100%;
+    height:auto;
+}
+
+.back{
+    margin-bottom:20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="back">
+<a href="index.html">← 返回首页</a>
+</div>
+
+<h1 id="title">加载中...</h1>
+
+<div class="meta" id="published"></div>
+
+<div class="labels" id="labels"></div>
+
+<hr>
+
+<div class="content" id="content"></div>
+
+<script>
+
+const params = new URLSearchParams(window.location.search);
+const articleId = params.get("id");
+
+fetch("data/articles.json")
+  .then(response => response.json())
+  .then(data => {
+
+      const article = data.find(
+          item => item.id === articleId
+      );
+
+      if(!article){
+
+          document.body.innerHTML =
+            "<h2>文章不存在</h2>";
+
+          return;
+      }
+
+      document.title =
+        article.title + " - 腾空世界观档案馆";
+
+      document.getElementById("title").innerText =
+        article.title;
+
+      document.getElementById("published").innerText =
+        "发布日期：" + article.published;
+
+      document.getElementById("labels").innerHTML =
+        "标签：" + article.labels.join(" / ");
+
+      document.getElementById("content").innerHTML =
+        article.content;
+
+  })
+  .catch(error => {
+
+      document.body.innerHTML =
+        "<h2>文章加载失败</h2>";
+
+  });
+
+</script>
+
+</body>
+</html>

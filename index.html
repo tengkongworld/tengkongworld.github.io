@@ -51,7 +51,9 @@ fetch('data/articles.json')
         <li>
           <strong>${article.published}</strong>
           -
-          ${article.title}
+          <a href="article.html?id=${article.id}">
+  ${article.title}
+</a>
         </li>
       `;
     });
