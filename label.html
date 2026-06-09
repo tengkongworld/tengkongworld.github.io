@@ -63,9 +63,21 @@ fetch("data/articles.json")
 
     articles.forEach(article => {
 
-        html +=         <li>             <strong>${article.published}</strong>             -             <a href="article.html?id=${article.id}">                 ${article.title}             </a>         </li>        ;
+        html += `
+            <li>
+                <strong>${article.published}</strong>
+                -
+                <a href="article.html?id=${article.id}">
+                    ${article.title}
+                </a>
+            </li>
+        `;
 
     });
+
+    if (articles.length === 0) {
+        html = "<li>该分类暂无文章</li>";
+    }
 
     list.innerHTML = html;
 
