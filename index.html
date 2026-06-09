@@ -29,6 +29,47 @@
 <hr>
 <hr>
 
+<hr>
+
+<h2>分类浏览</h2>
+
+<ul id="label-list">
+</ul>
+
+<script>
+
+fetch('data/articles.json')
+  .then(response => response.json())
+  .then(data => {
+
+    const labels = {};
+
+    data.forEach(article => {
+
+      article.labels.forEach(label => {
+
+        labels[label] = (labels[label] || 0) + 1;
+
+      });
+
+    });
+
+    let html = '';
+
+    Object.keys(labels)
+      .sort()
+      .forEach(label => {
+
+        html +=           <li>             <a href="label.html?name=${encodeURIComponent(label)}">               ${label}             </a>             (${labels[label]})           </li>        ;
+
+      });
+
+    document.getElementById('label-list').innerHTML = html;
+
+  });
+
+</script>
+
 <h2>最新文章</h2>
 
 <div id="latest-posts">
