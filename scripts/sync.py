@@ -1,3 +1,9 @@
+import re
+
+from urllib.parse import quote
+
+from pypinyin import lazy_pinyin
+
 import json
 import os
 from urllib.request import urlopen
@@ -8,6 +14,246 @@ PAGE_SIZE = 150
 
 print("开始同步 Blogger 档案...")
 
+def make_slug(text):
+
+    text = re.sub(
+        r"[《》【】（）()：:、，。！？\s\-]",
+        "",
+        text
+    )
+
+    return "".join(
+        lazy_pinyin(text)
+    )
+
+
+def build_article_filename(article):
+
+    if article["labels"]:
+
+        label = article["labels"][-1]
+
+    else:
+
+        label = "archive"
+
+    slug = make_slug(label)
+
+    return (
+        f"{article['published']}"
+        f"-{slug}"
+        f"-{article['id']}.html"
+    )
+
+def generate_html_files(articles):
+
+    os.makedirs(
+        "articles",
+        exist_ok=True
+    )
+
+    for article in articles:
+
+        current_label = ""
+
+        if article["labels"]:
+            current_label = article["labels"][-1]
+
+        same_label_articles = []
+
+        for a in articles:
+
+            if current_label in a["labels"]:
+                same_label_articles.append(a)
+
+        same_label_articles.sort(
+            key=lambda x: x["published"]
+        )        
+
+        current_index = same_label_articles.index(
+            article
+        )
+
+        previous_article = None
+        next_article = None
+
+        if current_index > 0:
+
+            previous_article = (
+                same_label_articles[
+                    current_index - 1
+                ]
+            )
+
+        if current_index < (
+            len(same_label_articles) - 1
+        ):
+
+            next_article = (
+                same_label_articles[
+                    current_index + 1
+                ]
+            )
+
+        filename = build_article_filename(
+            article
+        )
+
+        filepath = os.path.join(
+            "articles",
+            filename
+        )
+
+        label_links = []
+
+        for label in article["labels"]:
+
+            label_slug = make_slug(label)
+
+            label_links.append(
+                f'<a href="../labels/{label_slug}.html">{label}</a>'
+            )
+
+        labels_html = " / ".join(
+            label_links
+        )
+
+        navigation_html = ""
+
+        if previous_article:
+
+            navigation_html += (
+                f'<p>← '
+                f'<a href="{build_article_filename(previous_article)}">'
+                f'{previous_article["title"]}'
+                f'</a></p>'
+            )
+
+        if next_article:
+
+            navigation_html += (
+                f'<p>'
+                f'<a href="{build_article_filename(next_article)}">'
+                f'{next_article["title"]}'
+                f'</a> →</p>'
+            )
+
+        html = f"""<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1">
+
+<title>{article['title']}</title>
+
+<style>
+
+body{{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+    font-family:Arial, Helvetica, sans-serif;
+    line-height:1.8;
+}}
+
+img{{
+    max-width:100%;
+    height:auto;
+}}
+
+</style>
+
+</head>
+
+<body>
+
+<p>
+<a href="../index.html">
+← 返回首页
+</a>
+</p>
+
+<h1>
+{article['title']}
+</h1>
+
+<p>
+发布日期：
+{article['published']}
+</p>
+
+<p>
+标签：
+{labels_html}
+</p>
+
+<hr>
+
+{article['content']}
+
+<hr>
+
+<h3>上一篇 / 下一篇</h3>
+
+{navigation_html}
+
+<hr>
+
+<p>
+档案编号：
+{article['id']}
+</p>
+
+<p>
+来源：
+腾空世界观档案馆
+</p>
+
+</body>
+
+</html>
+"""
+
+        with open(
+            filepath,
+            "w",
+            encoding="utf-8"
+        ) as f:
+
+            f.write(html)
+
+def generate_label_pages(articles):
+    os.makedirs("labels", exist_ok=True)
+    label_articles = {}
+    for article in articles:
+        for label in article["labels"]:
+            if label not in label_articles:
+                label_articles[label] = []
+            label_articles[label].append(article)
+    for label, articles_list in label_articles.items():
+        filename = f"labels/{make_slug(label)}.html"
+        with open(filename, "w", encoding="utf-8") as f:
+            f.write(f"""<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{label}</title>
+</head>
+<body>
+    <h1>{label}</h1>
+    <ul>
+""")
+            for article in articles_list:
+                f.write(f'        <li><a href="../articles/{build_article_filename(article)}">{article["title"]}</a></li>\n')
+            f.write("""    </ul>
+</body>
+</html>
+""")
 
 # =========================
 # 抓取全部分页
@@ -155,3 +401,50 @@ print("同步完成")
 print("Feed读取数量:", len(feed_articles))
 print("档案馆总数量:", len(articles))
 print("输出文件:", OUTPUT_FILE)
+print()
+
+print(
+    build_article_filename(
+        articles[0]
+    )
+)
+print()
+print(
+    make_slug("《心经》佛界之解1")
+)
+
+print(
+    make_slug("难经心神难篇")
+)
+print()
+print("===== 难经人间难篇排序 =====")
+
+test_articles = []
+
+for a in articles:
+
+    if "难经人间难篇" in a["labels"]:
+        test_articles.append(a)
+
+test_articles.sort(
+    key=lambda x: x["published"]
+)
+
+for a in test_articles:
+
+    print(
+        a["published"],
+        a["title"]
+    )
+
+generate_html_files(
+    articles
+)
+generate_label_pages(
+    articles
+)
+print()
+print(
+    "静态HTML数量:",
+    len(articles)
+)
