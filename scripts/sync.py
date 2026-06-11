@@ -511,6 +511,12 @@ articles.sort(
     reverse=True
 )
 
+for article in articles:
+
+    article["filename"] = (
+        build_article_filename(article)
+    )
+
 
 # =========================
 # 保存
