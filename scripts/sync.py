@@ -513,10 +513,13 @@ articles.sort(
 
 for article in articles:
 
-    article["filename"] = (
-        build_article_filename(article)
-    )
+    article["filename"] = build_article_filename(article)
 
+    # generate label slugs for each article
+    article["label_slugs"] = []
+
+    for label in article.get("labels", []):
+        article["label_slugs"].append(make_slug(label))
 
 # =========================
 # 保存

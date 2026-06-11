@@ -40,12 +40,23 @@ fetch('data/articles.json')
   .then(data => {
 
     const labels = {};
+    const labelSlugs = {};
 
     data.forEach(article => {
 
-      article.labels.forEach(label => {
+      article.labels.forEach((label, index) => {
 
         labels[label] = (labels[label] || 0) + 1;
+
+        if (
+            article.label_slugs &&
+            article.label_slugs[index]
+        ) {
+
+            labelSlugs[label] =
+                article.label_slugs[index];
+
+        }
 
       });
 
@@ -59,7 +70,7 @@ fetch('data/articles.json')
 
     html += `
       <li>
-        <a href="label.html?name=${encodeURIComponent(label)}">
+        <a href="labels/${labelSlugs[label]}.html">
           ${label}
         </a>
         (${labels[label]})
