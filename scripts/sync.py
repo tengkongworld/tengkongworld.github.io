@@ -6,7 +6,10 @@ from pypinyin import lazy_pinyin
 
 import json
 import os
-from urllib.request import urlopen
+from urllib.request import (
+    urlopen,
+    urlretrieve
+)
 
 OUTPUT_FILE = "data/articles.json"
 
@@ -118,6 +121,28 @@ def generate_html_files(articles):
             label_links
         )
 
+        content = article["content"]
+
+        imgs = re.findall(
+            r'<img[^>]+src="([^"]+)"',
+            content
+        )
+
+        for index, img_url in enumerate(
+            imgs,
+            start=1
+        ):
+
+            local_image = (
+                f"../assets/images/"
+                f"{article['id']}-{index}.jpg"
+            )
+
+            content = content.replace(
+                img_url,
+                local_image
+            )
+
         navigation_html = ""
 
         if previous_article:
@@ -193,7 +218,7 @@ img{{
 
 <hr>
 
-{article['content']}
+{content}
 
 <hr>
 
@@ -255,6 +280,120 @@ def generate_label_pages(articles):
 </html>
 """)
 
+def download_images(articles):
+
+    os.makedirs(
+        "assets/images",
+        exist_ok=True
+    )
+
+    total = 0
+
+    for article in articles:
+
+        imgs = re.findall(
+            r'<img[^>]+src="([^"]+)"',
+            article["content"]
+        )
+
+        for index, img_url in enumerate(
+            imgs,
+            start=1
+        ):
+
+            original_url = img_url
+
+            img_url = re.sub(
+                r"/s\d+/",
+                "/s0/",
+                img_url
+            )
+
+            img_url = re.sub(
+                r"/w\d+-h\d+/",
+                "/s0/",
+                img_url
+            )
+
+            img_url = re.sub(
+                r"=w\d+-h\d+$",
+                "=s0",
+                img_url
+            )
+
+            if (
+                original_url == img_url
+                and "/s0/" not in img_url
+                and "=s0" not in img_url
+                and "/img/a/" not in img_url
+            ):
+
+                print(
+                    "未处理图片格式:",
+                    img_url
+                )
+
+            filename = (
+                f"{article['id']}"
+                f"-{index}.jpg"
+            )
+
+            filepath = os.path.join(
+                "assets/images",
+                filename
+            )
+
+            if os.path.exists(
+                filepath
+            ):
+
+                continue
+
+            try:
+
+                if "307230326693859030" in filename:
+
+                    print()
+                    print("===== 实际下载URL =====")
+                    print(img_url)
+                    print()
+
+                urlretrieve(
+                    img_url,
+                    filepath
+                )
+
+                total += 1
+
+                if "25-1.jpg" in img_url:
+                    print()
+                    print("===== 外星人图片 =====")
+                    print(img_url)
+                    print()
+
+                print(
+                    "下载:",
+                    filename
+                )
+
+            except Exception as e:
+
+                print(
+                    "失败:",
+                    img_url
+                )
+
+                print(
+
+                    e
+
+                 )
+
+    print()
+    print(
+        "新增图片:",
+        total
+    )
 # =========================
 # 抓取全部分页
 # =========================
@@ -441,6 +580,9 @@ generate_html_files(
     articles
 )
 generate_label_pages(
+    articles
+)
+download_images(
     articles
 )
 print()
