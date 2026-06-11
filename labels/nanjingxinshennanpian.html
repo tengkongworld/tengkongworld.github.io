@@ -7,7 +7,16 @@
 </head>
 <body>
     <h1>难经心神难篇</h1>
-    <ul>
+<p>
+<button onclick="sortAsc()">
+正序
+</button>
+
+<button onclick="sortDesc()">
+倒序
+</button>
+</p>   
+    <ul id="article-list">
         <li><a href="../articles/2026-06-06-nanjingxinshennanpian-8295472221827509450.html">弥勒菩萨《难经》心神难篇 第一百二十二难：心专注难 </a></li>
         <li><a href="../articles/2026-05-30-nanjingxinshennanpian-1933411889403435577.html">弥勒菩萨《难经》心神难篇 第一百二十一难：心喜鬼难 </a></li>
         <li><a href="../articles/2026-05-23-nanjingxinshennanpian-76499622656738899.html">弥勒菩萨《难经》心神难篇 第一百二十难：心无挂碍致心衰难 </a></li>
@@ -47,6 +56,42 @@
         <li><a href="../articles/2025-11-12-nanjingxinshennanpian-8915680508684034453.html">弥勒菩萨《难经》心神难篇 第八十六难：心烦难</a></li>
         <li><a href="../articles/2025-11-08-nanjingxinshennanpian-3454989100697217217.html">弥勒菩萨《难经》心神难篇 第八十五难：心走游离难</a></li>
         <li><a href="../articles/2025-11-05-nanjingxinshennanpian-5125451133319287708.html">弥勒菩萨《难经》心神难篇 第八十四难：惧难</a></li>
+
     </ul>
+
+<script>
+
+function sortAsc() {
+
+    const list =
+        document.getElementById(
+            "article-list"
+        );
+
+    const items =
+        Array.from(
+            list.children
+        );
+
+    items.reverse();
+
+    list.innerHTML = "";
+
+    items.forEach(item => {
+
+        list.appendChild(item);
+
+    });
+
+}
+
+function sortDesc() {
+
+    sortAsc();
+
+}
+
+</script>
+
 </body>
 </html>

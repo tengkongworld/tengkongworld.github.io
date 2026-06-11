@@ -7,7 +7,16 @@
 </head>
 <body>
     <h1>腾空看到的外星人</h1>
-    <ul>
+<p>
+<button onclick="sortAsc()">
+正序
+</button>
+
+<button onclick="sortDesc()">
+倒序
+</button>
+</p>   
+    <ul id="article-list">
         <li><a href="../articles/2026-05-31-tengkongkandaodewaixingren-1869789139507685336.html">腾空看到的外星人25：是一个6.6维高级星球，吹泡泡就是修行</a></li>
         <li><a href="../articles/2026-05-24-tengkongkandaodewaixingren-4688664216149884477.html">腾空看到的外星人24：约62亿年的古星球，6.3维高级星球</a></li>
         <li><a href="../articles/2026-05-17-tengkongkandaodewaixingren-6493531848205336404.html">腾空看到的外星人23：距今约26亿年的古星球，6.9维高级星球</a></li>
@@ -35,6 +44,42 @@
         <li><a href="../articles/2025-12-15-tengkongkandaodewaixingren-5011825391178216297.html">腾空看到的外星人1:5.7-5.8维星球，存在时间不长，算个新星球</a></li>
         <li><a href="../articles/2025-12-14-tengkongkandaodewaixingren-559345809503852410.html">《腾空看到的外星人》书中部分词语说明</a></li>
         <li><a href="../articles/2025-12-13-tengkongkandaodewaixingren-2418055937531940722.html">《腾空看到的外星人》缘起</a></li>
+
     </ul>
+
+<script>
+
+function sortAsc() {
+
+    const list =
+        document.getElementById(
+            "article-list"
+        );
+
+    const items =
+        Array.from(
+            list.children
+        );
+
+    items.reverse();
+
+    list.innerHTML = "";
+
+    items.forEach(item => {
+
+        list.appendChild(item);
+
+    });
+
+}
+
+function sortDesc() {
+
+    sortAsc();
+
+}
+
+</script>
+
 </body>
 </html>

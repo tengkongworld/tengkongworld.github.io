@@ -271,11 +271,56 @@ def generate_label_pages(articles):
 </head>
 <body>
     <h1>{label}</h1>
-    <ul>
+<p>
+<button onclick="sortAsc()">
+正序
+</button>
+
+<button onclick="sortDesc()">
+倒序
+</button>
+</p>   
+    <ul id="article-list">
 """)
             for article in articles_list:
                 f.write(f'        <li><a href="../articles/{build_article_filename(article)}">{article["title"]}</a></li>\n')
-            f.write("""    </ul>
+            f.write("""
+    </ul>
+
+<script>
+
+function sortAsc() {
+
+    const list =
+        document.getElementById(
+            "article-list"
+        );
+
+    const items =
+        Array.from(
+            list.children
+        );
+
+    items.reverse();
+
+    list.innerHTML = "";
+
+    items.forEach(item => {
+
+        list.appendChild(item);
+
+    });
+
+}
+
+function sortDesc() {
+
+    sortAsc();
+
+}
+
+</script>
+
 </body>
 </html>
 """)

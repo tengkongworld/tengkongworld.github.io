@@ -7,7 +7,16 @@
 </head>
 <body>
     <h1>难经神难篇</h1>
-    <ul>
+<p>
+<button onclick="sortAsc()">
+正序
+</button>
+
+<button onclick="sortDesc()">
+倒序
+</button>
+</p>   
+    <ul id="article-list">
         <li><a href="../articles/2025-11-01-nanjingshennanpian-6345640465839350214.html">弥勒菩萨《难经》神难篇 第八十三难：病引业力难</a></li>
         <li><a href="../articles/2025-10-31-nanjingshennanpian-5247682502170471568.html">弥勒菩萨《难经》神难篇 第八十二难：丑像难</a></li>
         <li><a href="../articles/2025-10-31-nanjingshennanpian-5436377471543897355.html">弥勒菩萨《难经》神难篇 第八十一难：鬼魂难</a></li>
@@ -45,6 +54,42 @@
         <li><a href="../articles/2025-10-03-nanjingshennanpian-7866317028639432721.html">弥勒菩萨《难经》神难篇 第四十九难：神魂飞难</a></li>
         <li><a href="../articles/2025-10-03-nanjingshennanpian-9017858412754845296.html">弥勒菩萨《难经》神难篇 第四十八难：毁坏神庙难</a></li>
         <li><a href="../articles/2025-10-03-nanjingshennanpian-1880817573205556925.html">弥勒菩萨《难经》神难篇 第四十七难：谤神难</a></li>
+
     </ul>
+
+<script>
+
+function sortAsc() {
+
+    const list =
+        document.getElementById(
+            "article-list"
+        );
+
+    const items =
+        Array.from(
+            list.children
+        );
+
+    items.reverse();
+
+    list.innerHTML = "";
+
+    items.forEach(item => {
+
+        list.appendChild(item);
+
+    });
+
+}
+
+function sortDesc() {
+
+    sortAsc();
+
+}
+
+</script>
+
 </body>
 </html>
