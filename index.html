@@ -28,6 +28,11 @@
 
 <hr>
 
+<div id="continue-reading">
+</div>
+
+<hr>
+
 <h2>分类浏览</h2>
 
 <ul id="label-list">
@@ -153,6 +158,48 @@ ${article.title}
 https://tengkongworld.blogspot.com/
 </a>
 </p>
+<script>
 
+const history = JSON.parse(
+
+    localStorage.getItem(
+        "readingHistory"
+    ) || "[]"
+
+);
+
+if (history.length > 0) {
+
+    const lastArticle = history[0];
+
+    document.getElementById(
+        "continue-reading"
+    ).innerHTML = `
+
+        <h2>继续阅读</h2>
+
+        <p>
+
+            上次阅读：
+
+            <strong>
+                ${lastArticle.title}
+            </strong>
+
+        </p>
+
+        <p>
+
+            <a href="${lastArticle.url}">
+                继续阅读 →
+            </a>
+
+        </p>
+
+    `;
+
+}
+
+</script>
 </body>
 </html>

@@ -73,6 +73,51 @@ img{
 腾空世界观档案馆
 </p>
 
+<script>
+
+const currentArticle = {
+
+    title: "騰空看到的外星人10：愛好收集各種不同的外星人",
+
+    url: window.location.pathname,
+
+    time: Date.now()
+
+};
+
+let history = JSON.parse(
+
+    localStorage.getItem(
+        "readingHistory"
+    ) || "[]"
+
+);
+
+history = history.filter(
+
+    item => item.url !== currentArticle.url
+
+);
+
+history.unshift(
+    currentArticle
+);
+
+history = history.slice(
+    0,
+    10
+);
+
+localStorage.setItem(
+
+    "readingHistory",
+
+    JSON.stringify(history)
+
+);
+
+</script>
+
 </body>
 
 </html>

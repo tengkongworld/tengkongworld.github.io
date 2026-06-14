@@ -238,6 +238,51 @@ img{{
 腾空世界观档案馆
 </p>
 
+<script>
+
+const currentArticle = {{
+
+    title: "{article['title']}",
+
+    url: window.location.pathname,
+
+    time: Date.now()
+
+}};
+
+let history = JSON.parse(
+
+    localStorage.getItem(
+        "readingHistory"
+    ) || "[]"
+
+);
+
+history = history.filter(
+
+    item => item.url !== currentArticle.url
+
+);
+
+history.unshift(
+    currentArticle
+);
+
+history = history.slice(
+    0,
+    10
+);
+
+localStorage.setItem(
+
+    "readingHistory",
+
+    JSON.stringify(history)
+
+);
+
+</script>
+
 </body>
 
 </html>

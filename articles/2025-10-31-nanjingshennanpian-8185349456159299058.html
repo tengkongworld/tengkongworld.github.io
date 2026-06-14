@@ -91,6 +91,51 @@ img{
 腾空世界观档案馆
 </p>
 
+<script>
+
+const currentArticle = {
+
+    title: "弥勒菩萨《难经》神难篇 第七十五难：想佛难",
+
+    url: window.location.pathname,
+
+    time: Date.now()
+
+};
+
+let history = JSON.parse(
+
+    localStorage.getItem(
+        "readingHistory"
+    ) || "[]"
+
+);
+
+history = history.filter(
+
+    item => item.url !== currentArticle.url
+
+);
+
+history.unshift(
+    currentArticle
+);
+
+history = history.slice(
+    0,
+    10
+);
+
+localStorage.setItem(
+
+    "readingHistory",
+
+    JSON.stringify(history)
+
+);
+
+</script>
+
 </body>
 
 </html>

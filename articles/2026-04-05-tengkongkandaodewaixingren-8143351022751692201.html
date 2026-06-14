@@ -73,6 +73,51 @@ img{
 腾空世界观档案馆
 </p>
 
+<script>
+
+const currentArticle = {
+
+    title: "腾空看到的外星人17：样貌类似地球上的青蛙，眼睛里有变化的公式",
+
+    url: window.location.pathname,
+
+    time: Date.now()
+
+};
+
+let history = JSON.parse(
+
+    localStorage.getItem(
+        "readingHistory"
+    ) || "[]"
+
+);
+
+history = history.filter(
+
+    item => item.url !== currentArticle.url
+
+);
+
+history.unshift(
+    currentArticle
+);
+
+history = history.slice(
+    0,
+    10
+);
+
+localStorage.setItem(
+
+    "readingHistory",
+
+    JSON.stringify(history)
+
+);
+
+</script>
+
 </body>
 
 </html>
