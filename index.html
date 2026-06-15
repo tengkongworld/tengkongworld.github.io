@@ -33,6 +33,11 @@
 
 <hr>
 
+<div id="recent-reading">
+</div>
+
+<hr>
+
 <h2>分类浏览</h2>
 
 <ul id="label-list">
@@ -199,7 +204,45 @@ if (history.length > 0) {
     `;
 
 }
+if (history.length > 0) {
 
+    let recentHtml = `
+
+        <h2>最近阅读</h2>
+
+        <ul>
+
+    `;
+
+    history.slice(0, 5).forEach(article => {
+
+        recentHtml += `
+
+            <li>
+
+                <a href="${article.url}">
+
+                    ${article.title}
+
+                </a>
+
+            </li>
+
+        `;
+
+    });
+
+    recentHtml += `
+
+        </ul>
+
+    `;
+
+    document.getElementById(
+        "recent-reading"
+    ).innerHTML = recentHtml;
+
+}
 </script>
 </body>
 </html>
