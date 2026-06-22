@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
+    <title>难经鬼难篇</title>
+</head>
+<body>
+<p><a href="../index.html">首页</a> / <a href="nanjing.html">难经</a> / 难经鬼难篇</p><h1>难经鬼难篇</h1>
+<div id="reading-progress">
+</div>
+
+<p>
+<button onclick="sortAsc()">
+正序
+</button>
+
+<button onclick="sortDesc()">
+倒序
+</button>
+</p>   
+    <ul id="article-list">
+
+        <li
+            data-index="0"
+            data-title="弥勒菩萨《难经》鬼难篇 第一百二十四难：鬼游世间难 "
+        >
+            <span class="read-mark">○</span>
+
+            <a href="../articles/2026-06-20-nanjingguinanpian-7968552138617476357.html">
+                弥勒菩萨《难经》鬼难篇 第一百二十四难：鬼游世间难 
+            </a>
+
+        </li>
+        
+    </ul>
+
+<script>
+
+function sortAsc() {
+
+    const list =
+        document.getElementById(
+            "article-list"
+        );
+
+    const items =
+        Array.from(
+            list.children
+        );
+
+    items.sort(
+        (a, b) =>
+        Number(b.dataset.index)
+        -
+        Number(a.dataset.index)
+    );
+
+    list.innerHTML = "";
+
+    items.forEach(item => {
+
+        list.appendChild(item);
+
+    });
+
+    localStorage.setItem(
+        "sortOrder",
+        "asc"
+    );
+
+}
+
+function sortDesc() {
+
+    const list =
+        document.getElementById(
+            "article-list"
+        );
+
+    const items =
+        Array.from(
+            list.children
+        );
+
+    items.sort(
+        (a, b) =>
+        Number(a.dataset.index)
+        -
+        Number(b.dataset.index)
+    );
+
+    list.innerHTML = "";
+
+    items.forEach(item => {
+
+        list.appendChild(item);
+
+    });
+
+    localStorage.setItem(
+        "sortOrder",
+        "desc"
+    );
+
+}
+
+const history = JSON.parse(
+
+    localStorage.getItem(
+        "readingHistory"
+    ) || "[]"
+
+);            
+                    
+const readTitles = history.map(
+
+    item => item.title
+
+);
+
+document
+    .querySelectorAll(
+        "li[data-title]"
+    )
+    .forEach(li => {
+
+        const title =
+            li.dataset.title;
+
+        if (
+            readTitles.includes(title)
+        ) {
+
+            li.querySelector(
+                ".read-mark"
+            ).textContent = "✓";
+
+        }
+
+    });   
+const totalArticles = document
+    .querySelectorAll(
+        "li[data-title]"
+    ).length;
+
+const readCount = document
+    .querySelectorAll(
+        ".read-mark"
+    );
+
+let finished = 0;
+
+readCount.forEach(mark => {
+
+    if (
+        mark.textContent === "✓"
+    ) {
+
+        finished++;
+
+    }
+
+});
+
+const percent = Math.round(
+
+    finished * 100 / totalArticles
+
+);
+
+document.getElementById(
+    "reading-progress"
+).innerHTML = `
+
+    <p>
+
+        已阅读：
+
+        ${finished}
+        /
+        ${totalArticles}
+
+        (${percent}%)
+
+    </p>
+
+`;
+
+if (nextArticle) {
+
+    const link =
+        nextArticle.querySelector(
+            "a"
+        );
+
+    document.getElementById(
+        "next-reading"
+    ).innerHTML = `
+
+        <p>
+
+            <strong>
+                建议继续阅读：
+            </strong>
+
+        </p>
+
+        <p>
+
+            <a href="${link.href}">
+                ${link.textContent}
+            </a>
+
+        </p>
+
+    `;
+
+}
+const savedOrder =
+
+    localStorage.getItem(
+        "sortOrder"
+    );
+
+if (
+    savedOrder === "asc"
+) {
+
+    sortAsc();
+
+}
+
+if (
+    savedOrder === "desc"
+) {
+
+    sortDesc();
+
+}                                                                 
+</script>
+
+</body>
+</html>

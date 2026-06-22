@@ -31,11 +31,13 @@ img{
 
 <body>
 
+<body>
+
+
 <p>
-<a href="../index.html">
-← 返回首页
-</a>
+<a href="../index.html">首页</a> / <a href="../labels/nanjing.html">难经</a> / <a href="../labels/nanjingrenjiannanpian.html">难经人间难篇</a>
 </p>
+
 
 <h1>
 弥勒菩萨《难经》人间难篇 第五难：无可难
@@ -44,11 +46,6 @@ img{
 <p>
 发布日期：
 2025-09-27
-</p>
-
-<p>
-标签：
-<a href="../labels/nanjing.html">难经</a> / <a href="../labels/nanjingrenjiannanpian.html">难经人间难篇</a>
 </p>
 
 <hr>
@@ -101,6 +98,10 @@ const currentArticle = {
 
 };
 
+
+
+/* 最近阅读 */
+
 let history = JSON.parse(
 
     localStorage.getItem(
@@ -131,6 +132,42 @@ localStorage.setItem(
     JSON.stringify(history)
 
 );
+
+
+
+/* 累计阅读 */
+
+let archive = JSON.parse(
+
+    localStorage.getItem(
+        "readingArchive"
+    ) || "[]"
+
+);
+
+if (
+
+    !archive.includes(
+        currentArticle.url
+    )
+
+) {
+
+    archive.push(
+        currentArticle.url
+    );
+
+    localStorage.setItem(
+
+        "readingArchive",
+
+        JSON.stringify(
+            archive
+        )
+
+    );
+
+}
 
 </script>
 

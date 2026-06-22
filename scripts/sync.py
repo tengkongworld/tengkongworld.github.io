@@ -121,6 +121,30 @@ def generate_html_files(articles):
             label_links
         )
 
+        breadcrumb_links = [
+            '<a href="../index.html">首页</a>'
+        ]
+
+        for label in article["labels"]:
+
+            label_slug = make_slug(
+                label
+            )
+
+            breadcrumb_links.append(
+
+                f'<a href="../labels/{label_slug}.html">'
+                f'{label}'
+                f'</a>'
+
+            )
+
+        back_to_label = f'''
+<p>
+{" / ".join(breadcrumb_links)}
+</p>
+'''
+
         content = article["content"]
 
         imgs = re.findall(
@@ -196,11 +220,9 @@ img{{
 
 <body>
 
-<p>
-<a href="../index.html">
-← 返回首页
-</a>
-</p>
+<body>
+
+{back_to_label}
 
 <h1>
 {article['title']}
@@ -209,11 +231,6 @@ img{{
 <p>
 发布日期：
 {article['published']}
-</p>
-
-<p>
-标签：
-{labels_html}
 </p>
 
 <hr>
@@ -250,6 +267,10 @@ const currentArticle = {{
 
 }};
 
+
+
+/* 最近阅读 */
+
 let history = JSON.parse(
 
     localStorage.getItem(
@@ -281,6 +302,42 @@ localStorage.setItem(
 
 );
 
+
+
+/* 累计阅读 */
+
+let archive = JSON.parse(
+
+    localStorage.getItem(
+        "readingArchive"
+    ) || "[]"
+
+);
+
+if (
+
+    !archive.includes(
+        currentArticle.url
+    )
+
+) {{
+
+    archive.push(
+        currentArticle.url
+    );
+
+    localStorage.setItem(
+
+        "readingArchive",
+
+        JSON.stringify(
+            archive
+        )
+
+    );
+
+}}
+
 </script>
 
 </body>
@@ -311,11 +368,65 @@ def generate_label_pages(articles):
 <html lang="zh-CN">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1">
     <title>{label}</title>
 </head>
 <body>
-    <h1>{label}</h1>
+""")
+
+            parent_label = ""
+
+            for article in articles_list:
+
+                if (
+                    article["labels"]
+                    and article["labels"][0] != label
+                ):
+
+                    parent_label = (
+                        article["labels"][0]
+                    )
+
+                    break
+
+            if parent_label:
+
+                f.write(
+
+                    f'<p>'
+                    f'<a href="../index.html">'
+                    f'首页'
+                    f'</a> / '
+                    f'<a href="{make_slug(parent_label)}.html">'
+                    f'{parent_label}'
+                    f'</a> / '
+                    f'{label}'
+                    f'</p>'
+
+                )
+
+            else:
+
+                f.write(
+
+                    f'<p>'
+                    f'<a href="../index.html">'
+                    f'首页'
+                    f'</a> / '
+                    f'{label}'
+                    f'</p>'
+
+                ) 
+
+            f.write(
+                f"<h1>{label}</h1>"
+            )
+
+            f.write(f"""
+<div id="reading-progress">
+</div>
+
 <p>
 <button onclick="sortAsc()">
 正序
@@ -327,8 +438,26 @@ def generate_label_pages(articles):
 </p>   
     <ul id="article-list">
 """)
-            for article in articles_list:
-                f.write(f'        <li><a href="../articles/{build_article_filename(article)}">{article["title"]}</a></li>\n')
+
+            for index, article in enumerate(
+                articles_list
+            ):
+
+                f.write(
+                    f'''
+        <li
+            data-index="{index}"
+            data-title="{article["title"]}"
+        >
+            <span class="read-mark">○</span>
+
+            <a href="../articles/{build_article_filename(article)}">
+                {article["title"]}
+            </a>
+
+        </li>
+        '''
+                )
             f.write("""
     </ul>
 
@@ -346,7 +475,12 @@ function sortAsc() {
             list.children
         );
 
-    items.reverse();
+    items.sort(
+        (a, b) =>
+        Number(b.dataset.index)
+        -
+        Number(a.dataset.index)
+    );
 
     list.innerHTML = "";
 
@@ -356,14 +490,180 @@ function sortAsc() {
 
     });
 
+    localStorage.setItem(
+        "sortOrder",
+        "asc"
+    );
+
 }
 
 function sortDesc() {
+
+    const list =
+        document.getElementById(
+            "article-list"
+        );
+
+    const items =
+        Array.from(
+            list.children
+        );
+
+    items.sort(
+        (a, b) =>
+        Number(a.dataset.index)
+        -
+        Number(b.dataset.index)
+    );
+
+    list.innerHTML = "";
+
+    items.forEach(item => {
+
+        list.appendChild(item);
+
+    });
+
+    localStorage.setItem(
+        "sortOrder",
+        "desc"
+    );
+
+}
+
+const history = JSON.parse(
+
+    localStorage.getItem(
+        "readingHistory"
+    ) || "[]"
+
+);            
+                    
+const readTitles = history.map(
+
+    item => item.title
+
+);
+
+document
+    .querySelectorAll(
+        "li[data-title]"
+    )
+    .forEach(li => {
+
+        const title =
+            li.dataset.title;
+
+        if (
+            readTitles.includes(title)
+        ) {
+
+            li.querySelector(
+                ".read-mark"
+            ).textContent = "✓";
+
+        }
+
+    });   
+const totalArticles = document
+    .querySelectorAll(
+        "li[data-title]"
+    ).length;
+
+const readCount = document
+    .querySelectorAll(
+        ".read-mark"
+    );
+
+let finished = 0;
+
+readCount.forEach(mark => {
+
+    if (
+        mark.textContent === "✓"
+    ) {
+
+        finished++;
+
+    }
+
+});
+
+const percent = Math.round(
+
+    finished * 100 / totalArticles
+
+);
+
+document.getElementById(
+    "reading-progress"
+).innerHTML = `
+
+    <p>
+
+        已阅读：
+
+        ${finished}
+        /
+        ${totalArticles}
+
+        (${percent}%)
+
+    </p>
+
+`;
+
+if (nextArticle) {
+
+    const link =
+        nextArticle.querySelector(
+            "a"
+        );
+
+    document.getElementById(
+        "next-reading"
+    ).innerHTML = `
+
+        <p>
+
+            <strong>
+                建议继续阅读：
+            </strong>
+
+        </p>
+
+        <p>
+
+            <a href="${link.href}">
+                ${link.textContent}
+            </a>
+
+        </p>
+
+    `;
+
+}
+const savedOrder =
+
+    localStorage.getItem(
+        "sortOrder"
+    );
+
+if (
+    savedOrder === "asc"
+) {
 
     sortAsc();
 
 }
 
+if (
+    savedOrder === "desc"
+) {
+
+    sortDesc();
+
+}                                                                 
 </script>
 
 </body>

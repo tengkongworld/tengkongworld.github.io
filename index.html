@@ -1,84 +1,831 @@
 <!DOCTYPE html>
 
 <html lang="zh-CN">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>腾空世界观档案馆</title>
-<meta name="description" content="腾空世界观公开资料档案馆，提供文章归档、分类索引与长期保存。">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>腾空世界观档案馆开源中心</title>
+    <meta name="description" content="腾空世界观公开资料档案馆，提供文章归档、分类索引与长期保存。">
+    <style>
+        /* =========================
+   基础样式
+========================= */
+
+        body {
+
+            max-width: 1200px;
+
+            margin: auto;
+
+            padding: 20px;
+
+            line-height: 1.8;
+
+            font-size: 18px;
+
+            background: #faf9f5;
+
+            color: #333;
+
+            transition:
+                background 0.3s ease,
+                color 0.3s ease;
+
+        }
+
+        h1 {
+
+            margin-top: 30px;
+
+            margin-bottom: 40px;
+
+        }
+
+        h2 {
+
+            margin-top: 0;
+
+            margin-bottom: 20px;
+
+        }
+
+        a {
+
+            text-decoration: none;
+
+        }
+
+        a:hover {
+
+            text-decoration: underline;
+
+        }
+
+        hr {
+
+            margin: 30px 0;
+
+        }
+
+
+        /* =========================
+   首页模块通用间距
+========================= */
+
+        #continue-reading:not(:empty),
+        #today-recommend,
+        #random-explore,
+        #recent-reading,
+        #collections {
+
+            margin: 30px 0;
+
+        }
+
+        #today-recommend {
+
+            transition:
+
+                transform 0.25s ease,
+
+                box-shadow 0.25s ease;
+
+        }
+
+        #today-recommend:hover {
+
+            transform:
+
+                translateY(-4px);
+
+            box-shadow:
+
+                0 10px 24px rgba(0, 0, 0, 0.08);
+
+        }
+
+        .recommend-image {
+
+            transition:
+                transform 0.35s ease;
+
+        }
+
+        .today-image {
+
+            width: 100%;
+
+            max-width: 500px;
+
+            border-radius: 12px;
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.08);
+
+            transition:
+                transform 0.3s ease,
+                box-shadow 0.3s ease;
+
+            cursor: pointer;
+
+        }
+
+        .today-image:hover {
+
+            transform: scale(1.02);
+
+            box-shadow:
+                0 12px 28px rgba(0, 0, 0, 0.15);
+
+        }
+
+        #today-recommend:hover .recommend-image {
+
+            transform:
+                scale(1.03);
+
+        }
+
+
+        /* =========================
+   简介区域
+========================= */
+
+        .intro {
+
+            margin-bottom: 30px;
+
+        }
+
+
+        /* =========================
+   首页卡片
+========================= */
+
+        #continue-reading:not(:empty),
+        #today-recommend,
+        #random-explore {
+
+            padding: 24px;
+
+            border-radius: 16px;
+
+            background: #fffdfa;
+
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.05);
+
+        }
+
+
+        /* =========================
+   数字展厅
+========================= */
+
+        #collections {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit,
+                    minmax(250px,
+                        1fr));
+
+            gap: 24px;
+
+        }
+
+        .collection-card {
+
+            position: relative;
+
+            overflow: hidden;
+
+            background: #fffdfa;
+
+            border: 1px solid #ddd;
+
+            border-radius: 12px;
+
+            padding: 15px;
+
+            box-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.05);
+
+            transition:
+                transform 0.25s ease,
+                box-shadow 0.25s ease;
+
+        }
+
+        .collection-card:hover {
+
+            transform:
+                translateY(-6px);
+
+            box-shadow:
+                0 8px 20px rgba(0, 0, 0, 0.12);
+
+        }
+
+        .collection-card img {
+
+            width: 100%;
+
+            height: auto;
+
+            border-radius: 8px;
+
+            transition:
+                transform 0.3s ease;
+
+        }
+
+        .collection-card:hover img {
+
+            transform:
+                scale(1.02);
+
+        }
+
+
+        /* =========================
+   按钮
+========================= */
+
+        button {
+
+            padding: 8px 14px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 8px;
+
+            background: white;
+
+            cursor: pointer;
+
+            margin-right: 8px;
+
+            transition:
+                all 0.2s ease;
+
+        }
+
+        button:hover {
+
+            background: #f0f0f0;
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 4px 12px rgba(0, 0, 0, 0.15);
+
+        }
+
+        .theme-active {
+
+            background: #3b82f6;
+
+            color: white;
+
+            border-color: #3b82f6;
+
+        }
+
+
+        /* =========================
+   护眼模式
+========================= */
+
+        body.eye {
+
+            background: #f4f1e8;
+
+            color: #3a3a3a;
+
+        }
+
+        body.eye #continue-reading,
+        body.eye #today-recommend,
+        body.eye #random-explore,
+        body.eye .collection-card {
+
+            background: #faf7ee;
+
+        }
+
+
+        /* =========================
+   古籍模式
+========================= */
+
+        body.classic {
+
+            background: #efe4c8;
+
+            color: #4a3b2a;
+
+        }
+
+        body.classic #continue-reading,
+        body.classic #today-recommend,
+        body.classic #random-explore,
+        body.classic .collection-card {
+
+            background: #f4ecd2;
+
+        }
+
+
+        /* =========================
+   夜间模式
+========================= */
+
+        body.dark {
+
+            background: #1f1f1f;
+
+            color: #dddddd;
+
+        }
+
+        body.dark a {
+
+            color: #8ab4ff;
+
+        }
+
+        body.dark #continue-reading,
+        body.dark #today-recommend,
+        body.dark #random-explore,
+        body.dark .collection-card {
+
+            background: #2b2b2b;
+
+            border-color: #444;
+
+        }
+
+        body.dark img {
+
+            box-shadow:
+                0 0 12px rgba(255,
+                    255,
+                    255,
+                    0.08);
+
+        }
+
+        body.dark .theme-active {
+
+            background: #8ab4ff;
+
+            color: #111;
+
+        }
+
+        .collection-count {
+
+            margin-top: 12px;
+
+            font-size: 0.95em;
+
+            color: #777;
+
+        }
+
+        body.dark .collection-count {
+
+            color: #aaa;
+
+        }
+
+        .card-overlay {
+
+            position: absolute;
+
+            inset: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            background:
+                rgba(0,
+                    0,
+                    0,
+                    0.65);
+
+            color: white;
+
+            font-size: 22px;
+
+            font-weight: bold;
+
+            opacity: 0;
+
+            transition:
+                opacity 0.3s ease;
+
+        }
+
+        .collection-card:hover .card-overlay {
+
+            opacity: 1;
+
+        }
+
+        .collection-link {
+
+            display: block;
+
+            text-decoration: none;
+
+            color: inherit;
+
+        }
+
+        .card-overlay {
+
+            pointer-events: none;
+
+        }
+
+        .recommend-badge {
+
+            display: inline-block;
+
+            padding: 6px 12px;
+
+            border-radius: 999px;
+
+            background: #f3e8ff;
+
+            color: #6b21a8;
+
+            font-size: 14px;
+
+            font-weight: bold;
+
+            margin-bottom: 16px;
+
+        }
+
+        .continue-label {
+
+            color: #777;
+
+            font-size: 14px;
+
+            margin-bottom: 8px;
+
+        }
+
+        .continue-title {
+
+            font-size: 24px;
+
+            font-weight: bold;
+
+            line-height: 1.5;
+
+            margin-bottom: 20px;
+
+        }
+
+        .continue-button {
+
+            display: inline-block;
+
+            padding: 10px 18px;
+
+            border-radius: 999px;
+
+            background: #6b21a8;
+
+            color: white;
+
+            font-weight: bold;
+
+            text-decoration: none;
+
+            transition: all 0.2s ease;
+
+        }
+
+        .continue-button:hover {
+
+            transform:
+                translateY(-2px);
+
+        }
+
+        .explore-desc {
+
+            font-size: 18px;
+
+            margin-bottom: 12px;
+
+        }
+
+        #random-button {
+
+            padding: 12px 24px;
+
+            border-radius: 999px;
+
+            border: none;
+
+            background: #6b21a8;
+
+            color: white;
+
+            font-size: 16px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition:
+                all 0.25s ease;
+
+        }
+
+        #random-button:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 8px 20px rgba(107, 33, 168, 0.25);
+
+        }
+
+        body.dark #random-button {
+
+            background: #8ab4ff;
+
+            color: #111;
+
+        }
+
+        .read-button {
+
+            display: inline-block;
+
+            padding: 12px 24px;
+
+            border-radius: 999px;
+
+            background: #6b21a8;
+
+            color: white !important;
+
+            font-weight: bold;
+
+            text-decoration: none;
+
+            transition:
+                all 0.25s ease;
+
+        }
+
+        .read-button:hover {
+
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 8px 20px rgba(107, 33, 168, 0.25);
+
+            text-decoration: none;
+
+        }
+    </style>
+
 </head>
 
 <body>
 
-<h1>腾空世界观档案馆</h1>
 
-<p>
-客观记录腾空的所见所闻与宇宙观点。
-</p>
+    <div class="intro">
+        <h1>腾空世界观档案馆开源中心</h1>
 
-<p>
-本档案馆内容同步整理自“腾空世界观”主站，
-主要用于资料保存、分类索引与文献检索。
-</p>
+        <p>
+            一个以长期保存、
+            开放传播与文献研究为目的的数字典藏系统。
+        </p>
 
-<p>
-本内容仅作为个人记录与交流材料，
-不构成任何结论、立场或行动倡议。
-</p>
+        <p>
+            内容来源于腾空的转述记录，
+            按照原始结构整理归档，
+            以保证资料的完整性与可追溯性。
+        </p>
 
-<hr>
+        <p>
+            所有资料均可自由阅读、
+            下载、保存、引用与转载。
+            任何时间点的版本都可作为独立档案保存。
+            本档案馆持续整理与扩充中。
+            欢迎个人收藏、镜像保存与长期归档。
+        </p>
 
-<div id="continue-reading">
-</div>
+        <p>
+            为避免内容失真，
+            转载时应保持原文完整，
+            不得擅自修改原始记录内容。
+        </p>
 
-<hr>
+        <p>
 
-<div id="recent-reading">
-</div>
+        </p>
 
-<hr>
+    </div>
 
-<h2>分类浏览</h2>
+    <div id="continue-reading">
+    </div>
 
-<ul id="label-list">
-</ul>
+    <div id="today-recommend">
 
-<script>
+        <h2>
+            今天从哪里开始？
+        </h2>
 
-fetch('data/articles.json')
-  .then(response => response.json())
-  .then(data => {
+        <p>
+            正在生成推荐...
+        </p>
 
-    const labels = {};
-    const labelSlugs = {};
+    </div>
 
-    data.forEach(article => {
+    <div id="random-explore">
 
-      article.labels.forEach((label, index) => {
+        <h2>
+            随机探索
+        </h2>
 
-        labels[label] = (labels[label] || 0) + 1;
+        <p>
+            准备中...
+        </p>
 
-        if (
-            article.label_slugs &&
-            article.label_slugs[index]
-        ) {
+    </div>
 
-            labelSlugs[label] =
-                article.label_slugs[index];
+    <div id="recent-reading">
+    </div>
 
-        }
+    <!-- 这里新增 -->
 
-      });
+    <div id="theme-selector">
 
-    });
+        <h2>
+            阅读模式
+        </h2>
 
-    let html = '';
+        <button data-theme="default">
+            标准
+        </button>
 
-    Object.keys(labels)
-  .sort()
-  .forEach(label => {
+        <button data-theme="eye">
+            护眼
+        </button>
 
-    html += `
+        <button data-theme="dark">
+            夜间
+        </button>
+
+        <button data-theme="classic">
+            古籍
+        </button>
+
+    </div>
+
+    <hr>
+
+    <h2>数字展厅</h2>
+
+    <div id="collections">
+    </div>
+
+    <hr>
+
+    <h2>馆藏目录</h2>
+
+    <ul id="label-list">
+    </ul>
+
+    <hr>
+
+    <h2>档案统计</h2>
+
+    <div id="archive-stats">
+    </div>
+
+    <script>
+
+        fetch('data/articles.json')
+            .then(response => response.json())
+            .then(data => {
+
+                function getFirstImage(html) {
+
+                    const doc =
+                        new DOMParser()
+                            .parseFromString(
+                                html,
+                                "text/html"
+                            );
+
+                    const img =
+                        doc.querySelector("img");
+
+                    if (!img) {
+
+                        return null;
+
+                    }
+
+                    const link =
+                        img.closest("a");
+
+                    return link
+                        ? link.href
+                        : img.src;
+
+                }
+
+                const labels = {};
+                const labelSlugs = {};
+
+                const collections = [
+
+                    {
+                        title: "难经",
+                        image: "images/nanjing.jpg",
+                        description: "弥勒菩萨《难经》系列",
+                        url: "labels/nanjing.html",
+
+                        label: "难经"
+                    },
+
+                    {
+                        title: "心经",
+                        image: "images/xinjing.jpg",
+                        description: "《心经》佛界之解",
+                        url: "labels/xinjing.html",
+
+                        label: "《心经》佛界之解1"
+                    },
+
+                    {
+                        title: "道德经",
+                        image: "images/daodejing.jpg",
+                        description: "老子再传《道德经》佛界版",
+                        url: "labels/daodejingfujieban.html",
+
+                        label: "《道德经》佛界版"
+                    },
+
+                    {
+                        title: "外星人",
+                        image: "images/waixingren.jpg",
+                        description: "腾空看到的外星人系列",
+                        url: "labels/tengkongkandaodewaixingren.html",
+
+                        label: "腾空看到的外星人"
+                    }
+
+                ];
+
+                data.forEach(article => {
+
+                    article.labels.forEach((label, index) => {
+
+                        labels[label] = (labels[label] || 0) + 1;
+
+                        if (
+                            article.label_slugs &&
+                            article.label_slugs[index]
+                        ) {
+
+                            labelSlugs[label] =
+                                article.label_slugs[index];
+
+                        }
+
+                    });
+
+                });
+
+                let html = '';
+
+                Object.keys(labels)
+                    .sort()
+                    .forEach(label => {
+
+                        html += `
       <li>
         <a href="labels/${labelSlugs[label]}.html">
           ${label}
@@ -87,162 +834,581 @@ fetch('data/articles.json')
       </li>
     `;
 
-  });
+                    });
 
-    document.getElementById('label-list').innerHTML = html;
+                document.getElementById(
+                    'label-list'
+                ).innerHTML = html;
 
-  });
+                const history = JSON.parse(
+                    localStorage.getItem(
+                        "readingHistory"
+                    ) || "[]"
+                );
 
-</script>
+                const readCount = history.length;
 
-<h2>最新文章</h2>
+                const latestDate =
 
-<div id="latest-posts">
-<p>正在加载文章...</p>
+                    data.reduce(
+
+                        (latest, article) =>
+
+                            article.published > latest
+
+                                ? article.published
+
+                                : latest,
+
+                        data[0].published
+
+                    );
+
+                const percent = Math.round(
+                    readCount * 100 /
+                    data.length
+                );
+
+                document.getElementById(
+                    "archive-stats"
+                ).innerHTML = `
+
+    <ul>
+
+        <li>
+            馆藏总数：
+            ${data.length} 篇
+        </li>
+
+        <li>
+            馆藏类别：
+            ${Object.keys(labels).length} 类
+        </li>
+
+        <li>
+            最新入藏：
+            ${latestDate}
+        </li>
+
+        <li>
+            已阅读：
+            ${readCount} 篇
+        </li>
+
+        <li>
+            阅读进度：
+            ${percent}%
+        </li>
+
+    </ul>
+
+`;
+
+                let collectionsHtml = "";
+
+                collections.forEach(
+                    item => {
+
+                        const count =
+
+                            labels[
+                            item.label
+                            ] || 0;
+
+                        collectionsHtml += `
+        <a
+            href="${item.url}"
+            class="collection-link"
+        >
+            <div class="collection-card">
+                <img
+                    src="${item.image}"
+                    alt="${item.title}"
+                    loading="lazy"
+                >
+                <h3>
+                    ${item.title}
+                </h3>
+                <p>
+                    ${item.description}
+                </p>
+                <p>
+                    馆藏文献：
+                    ${count} 篇
+                </p>
+                <div class="card-overlay">
+                    进入展厅 →
+                </div>
+            </div>
+        </a>
+        `;
+
+                    }
+                );
+
+                document.getElementById(
+                    "collections"
+                ).innerHTML =
+                    collectionsHtml;
+
+                /* ===== 今日推荐 ===== */
+
+                const today = new Date();
+
+                const dayNumber = Math.floor(
+                    today.getTime() /
+                    86400000
+                );
+
+                let index =
+                    dayNumber %
+                    data.length;
+
+                const readTitles =
+                    history.map(
+                        item => item.title
+                    );
+
+                let article =
+                    data[index];
+
+                let count = 0;
+
+                while (
+
+                    readTitles.includes(
+                        article.title
+                    )
+
+                    &&
+
+                    count < data.length
+
+                ) {
+
+                    index =
+                        (index + 1)
+                        %
+                        data.length;
+
+                    article =
+                        data[index];
+
+                    count++;
+
+                }
+
+                const image =
+
+                    getFirstImage(
+                        article.content
+                    );
+
+                document.getElementById(
+                    "today-recommend"
+                ).innerHTML = `
+
+    <h2>
+        今天从哪里开始？
+    </h2>
+
+     <p class="recommend-badge">
+
+         今日推荐
+
+    </p>
+
+    <p>
+        <a href="articles/${article.filename}">
+
+            <img
+                src="${image}"
+                alt="${article.title}"
+                loading="lazy"
+                class="today-image"
+            >
+
+        </a>
+
+    </p>
+
+    <p>
+        <strong>
+            ${article.title}
+        </strong>
+    </p>
+
+    <p>
+
+    分类：
+
+    ${article.labels.join(" / ")}
+
+     </p>
+
+    <p>
+
+    发布日期：
+
+    ${article.published}
+
+     </p>
+
+    <p>
+        <a
+            href="articles/${article.filename}"
+            class="read-button"
+        >
+            开始阅读 →
+        </a>
+    </p>
+
+`;
+                /* ===== 随机探索 ===== */
+
+                const unreadArticles = data.filter(
+
+                    article =>
+
+                        !readTitles.includes(
+                            article.title
+                        )
+
+                );
+
+                document.getElementById(
+                    "random-explore"
+                ).innerHTML = `
+
+<h2>
+
+🎲 随机探索
+
+</h2>
+
+<p class="explore-desc">
+
+馆藏中还有
+
+<strong>
+
+${unreadArticles.length}
+
+</strong>
+
+篇文献等待发现。
+
+</p>
+
+<p>
+
+每一次点击，
+
+都会随机打开一篇尚未阅读的内容。
+
+</p>
+
+<button id="random-button">
+
+开始探索 →
+
+</button>
+
+`;
+                document.getElementById(
+                    "random-button"
+                ).addEventListener(
+                    "click",
+                    () => {
+
+                        let pool;
+
+                        if (
+                            unreadArticles.length > 0
+                        ) {
+
+                            pool =
+                                unreadArticles;
+
+                        } else {
+
+                            pool =
+                                data;
+
+                        }
+
+                        const randomArticle =
+
+                            pool[
+                            Math.floor(
+                                Math.random()
+                                *
+                                pool.length
+                            )
+                            ];
+
+                        window.location.href =
+
+                            "articles/" +
+
+                            randomArticle.filename;
+
+                    }
+                );
+
+            });
+
+    </script>
+
+    <h2>相关链接</h2>
+
+    <ul>
+
+        <li>
+            主站：
+            <a href="https://tengkongworld.blogspot.com/">
+                https://tengkongworld.blogspot.com/
+            </a>
+        </li>
+
+    </ul>
+
+    <script>
+
+        const history = JSON.parse(
+
+            localStorage.getItem(
+                "readingHistory"
+            ) || "[]"
+
+        );
+
+        if (history.length > 0) {
+
+            const lastArticle = history[0];
+
+            document.getElementById(
+                "continue-reading"
+            ).innerHTML = `
+
+<h2>
+
+    📖 继续阅读
+
+</h2>
+
+<p class="continue-label">
+
+    上次阅读
+
+</p>
+
+<div class="continue-title">
+
+    ${lastArticle.title}
+
 </div>
 
-<script>
-fetch('data/articles.json')
-  .then(response => response.json())
-  .then(data => {
-
-    const container = document.getElementById('latest-posts');
-
-    const latest = data.slice(0, 20);
-
-    let html = '<ul>';
-
-    latest.forEach(article => {
-      html += `
-        <li>
-          <strong>${article.published}</strong>
-          -
-<a href="articles/${article.filename}">
-${article.title}
-</a>
-        </li>
-      `;
-    });
-
-    html += '</ul>';
-
-    container.innerHTML = html;
-
-  })
-  .catch(error => {
-    document.getElementById('latest-posts').innerHTML =
-      '<p>文章加载失败。</p>';
-  });
-</script>
-
-<h2>网站建设中</h2>
-
 <p>
-目前正在建立文章归档、分类索引与搜索系统。
+
+    <a
+
+        href="${lastArticle.url}"
+
+        class="continue-button"
+
+    >
+
+        继续阅读 →
+
+    </a>
+
 </p>
 
-<p>
-未来将收录：
-</p>
+`;
 
-<ul>
-<li>《难经》系列</li>
-<li>《道德经》佛界版</li>
-<li>《心经》佛界之解</li>
-<li>《论语》相关内容</li>
-<li>《山海经》相关内容</li>
-<li>腾空看到的外星人</li>
-<li>其他公开发布资料</li>
-</ul>
+        } else {
 
-<hr>
+            document.getElementById(
+                "continue-reading"
+            ).style.display =
+                "none";
 
-<p>
-主站：
-<a href="https://tengkongworld.blogspot.com/">
-https://tengkongworld.blogspot.com/
-</a>
-</p>
-<script>
+        }
 
-const history = JSON.parse(
+        if (history.length > 0) {
 
-    localStorage.getItem(
-        "readingHistory"
-    ) || "[]"
+            let html = `
 
-);
-
-if (history.length > 0) {
-
-    const lastArticle = history[0];
-
-    document.getElementById(
-        "continue-reading"
-    ).innerHTML = `
-
-        <h2>继续阅读</h2>
-
-        <p>
-
-            上次阅读：
-
-            <strong>
-                ${lastArticle.title}
-            </strong>
-
-        </p>
-
-        <p>
-
-            <a href="${lastArticle.url}">
-                继续阅读 →
-            </a>
-
-        </p>
-
-    `;
-
-}
-if (history.length > 0) {
-
-    let recentHtml = `
-
-        <h2>最近阅读</h2>
+        <h2>
+        最近阅读
+        </h2>
 
         <ul>
 
     `;
 
-    history.slice(0, 5).forEach(article => {
+            function formatDate(time) {
 
-        recentHtml += `
+                const date = new Date(time);
 
-            <li>
+                const year =
+                    date.getFullYear();
 
-                <a href="${article.url}">
+                const month =
+                    String(
+                        date.getMonth() + 1
+                    ).padStart(2, "0");
 
-                    ${article.title}
+                const day =
+                    String(
+                        date.getDate()
+                    ).padStart(2, "0");
 
-                </a>
+                return `${year}-${month}-${day}`;
 
-            </li>
+            }
 
-        `;
+            history.forEach(article => {
 
-    });
+                html +=
+                    "<li>" +
+                    "<small>" +
+                    formatDate(article.time) +
+                    "</small><br>" +
+                    '<a href="' +
+                    article.url +
+                    '">' +
+                    article.title +
+                    "</a>" +
+                    "</li>";
 
-    recentHtml += `
+            });
 
-        </ul>
+            html += "</ul>";
 
-    `;
+            document.getElementById(
+                "recent-reading"
+            ).innerHTML = html;
 
-    document.getElementById(
-        "recent-reading"
-    ).innerHTML = recentHtml;
+        }
 
-}
-</script>
+        /* ===== 阅读主题 ===== */
+
+        document
+
+            .querySelectorAll(
+
+                "[data-theme]"
+
+            )
+
+            .forEach(button => {
+
+                button.addEventListener(
+
+                    "click",
+
+                    () => {
+
+                        document.body.classList.remove(
+                            "eye",
+                            "dark",
+                            "classic"
+                        );
+
+                        if (
+
+                            button.dataset.theme !==
+                            "default"
+
+                        ) {
+
+                            document.body.classList.add(
+                                button.dataset.theme
+                            );
+
+                        }
+
+                        localStorage.setItem(
+
+                            "theme",
+
+                            button.dataset.theme
+
+                        );
+
+                        document
+
+                            .querySelectorAll(
+
+                                "[data-theme]"
+
+                            )
+
+                            .forEach(btn => {
+
+                                btn.classList.remove(
+                                    "theme-active"
+                                );
+
+                            });
+
+                        button.classList.add(
+                            "theme-active"
+                        );
+
+                    }
+
+                );
+
+            });
+
+        const savedTheme =
+
+            localStorage.getItem(
+
+                "theme"
+
+            );
+
+        if (savedTheme) {
+
+            document.body.classList.remove(
+                "eye",
+                "dark",
+                "classic"
+            );
+
+            if (
+
+                savedTheme !==
+                "default"
+
+            ) {
+
+                document.body.classList.add(
+                    savedTheme
+                );
+
+            }
+
+            const activeButton =
+
+                document.querySelector(
+                    `[data-theme="${savedTheme}"]`
+                );
+
+            if (activeButton) {
+
+                activeButton.classList.add(
+                    "theme-active"
+                );
+
+            }
+
+        }
+    </script>
 </body>
+
 </html>

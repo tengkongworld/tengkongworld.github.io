@@ -31,11 +31,13 @@ img{
 
 <body>
 
+<body>
+
+
 <p>
-<a href="../index.html">
-← 返回首页
-</a>
+<a href="../index.html">首页</a> / <a href="../labels/daodejingfujieban.html">《道德经》佛界版</a>
 </p>
+
 
 <h1>
 老子再传《道德经》佛界版 【第十六章】
@@ -44,11 +46,6 @@ img{
 <p>
 发布日期：
 2026-04-29
-</p>
-
-<p>
-标签：
-<a href="../labels/daodejingfujieban.html">《道德经》佛界版</a>
 </p>
 
 <hr>
@@ -109,6 +106,10 @@ const currentArticle = {
 
 };
 
+
+
+/* 最近阅读 */
+
 let history = JSON.parse(
 
     localStorage.getItem(
@@ -139,6 +140,42 @@ localStorage.setItem(
     JSON.stringify(history)
 
 );
+
+
+
+/* 累计阅读 */
+
+let archive = JSON.parse(
+
+    localStorage.getItem(
+        "readingArchive"
+    ) || "[]"
+
+);
+
+if (
+
+    !archive.includes(
+        currentArticle.url
+    )
+
+) {
+
+    archive.push(
+        currentArticle.url
+    );
+
+    localStorage.setItem(
+
+        "readingArchive",
+
+        JSON.stringify(
+            archive
+        )
+
+    );
+
+}
 
 </script>
 

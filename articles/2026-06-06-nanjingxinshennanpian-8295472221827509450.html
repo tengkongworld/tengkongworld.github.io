@@ -31,11 +31,13 @@ img{
 
 <body>
 
+<body>
+
+
 <p>
-<a href="../index.html">
-← 返回首页
-</a>
+<a href="../index.html">首页</a> / <a href="../labels/nanjing.html">难经</a> / <a href="../labels/nanjingxinshennanpian.html">难经心神难篇</a>
 </p>
+
 
 <h1>
 弥勒菩萨《难经》心神难篇 第一百二十二难：心专注难 
@@ -44,11 +46,6 @@ img{
 <p>
 发布日期：
 2026-06-06
-</p>
-
-<p>
-标签：
-<a href="../labels/nanjing.html">难经</a> / <a href="../labels/nanjingxinshennanpian.html">难经心神难篇</a>
 </p>
 
 <hr>
@@ -83,7 +80,7 @@ img{
 
 <h3>上一篇 / 下一篇</h3>
 
-<p>← <a href="2026-05-30-nanjingxinshennanpian-1933411889403435577.html">弥勒菩萨《难经》心神难篇 第一百二十一难：心喜鬼难 </a></p>
+<p>← <a href="2026-05-30-nanjingxinshennanpian-1933411889403435577.html">弥勒菩萨《难经》心神难篇 第一百二十一难：心喜鬼难 </a></p><p><a href="2026-06-13-nanjingxinshennanpian-7234918449146109133.html">弥勒菩萨《难经》心神难篇 第一百二十三难：心活跃致引鬼难 </a> →</p>
 
 <hr>
 
@@ -108,6 +105,10 @@ const currentArticle = {
     time: Date.now()
 
 };
+
+
+
+/* 最近阅读 */
 
 let history = JSON.parse(
 
@@ -139,6 +140,42 @@ localStorage.setItem(
     JSON.stringify(history)
 
 );
+
+
+
+/* 累计阅读 */
+
+let archive = JSON.parse(
+
+    localStorage.getItem(
+        "readingArchive"
+    ) || "[]"
+
+);
+
+if (
+
+    !archive.includes(
+        currentArticle.url
+    )
+
+) {
+
+    archive.push(
+        currentArticle.url
+    );
+
+    localStorage.setItem(
+
+        "readingArchive",
+
+        JSON.stringify(
+            archive
+        )
+
+    );
+
+}
 
 </script>
 
