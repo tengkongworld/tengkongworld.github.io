@@ -840,13 +840,13 @@
                     'label-list'
                 ).innerHTML = html;
 
-                const history = JSON.parse(
+                const archive = JSON.parse(
                     localStorage.getItem(
-                        "readingHistory"
+                        "readingArchive"
                     ) || "[]"
                 );
 
-                const readCount = history.length;
+                const readCount = archive.length;
 
                 const latestDate =
 
@@ -864,10 +864,14 @@
 
                     );
 
-                const percent = Math.round(
-                    readCount * 100 /
-                    data.length
-                );
+                const percent = data.length > 0
+
+                    ? Math.round(
+                        readCount * 100 /
+                        data.length
+                    )
+
+                    : 0;
 
                 document.getElementById(
                     "archive-stats"
@@ -964,10 +968,20 @@
                     dayNumber %
                     data.length;
 
-                const readTitles =
-                    history.map(
-                        item => item.title
-                    );
+                const unreadArticles = data.filter(
+
+                    article =>
+
+                        !archive.includes(
+
+                            "/articles/" +
+                            article.filename
+
+                        )
+
+                );
+
+                const readUrls = archive;
 
                 let article =
                     data[index];
@@ -976,8 +990,11 @@
 
                 while (
 
-                    readTitles.includes(
-                        article.title
+                    readUrls.includes(
+
+                        "/articles/" +
+                        article.filename
+
                     )
 
                     &&
@@ -1065,16 +1082,6 @@
 
 `;
                 /* ===== 随机探索 ===== */
-
-                const unreadArticles = data.filter(
-
-                    article =>
-
-                        !readTitles.includes(
-                            article.title
-                        )
-
-                );
 
                 document.getElementById(
                     "random-explore"
