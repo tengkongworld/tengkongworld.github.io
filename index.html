@@ -605,6 +605,47 @@
             text-decoration: none;
 
         }
+
+        #reading-backup {
+
+            margin-top: 20px;
+
+        }
+
+        #export-reading,
+
+        #import-reading {
+
+            padding: 10px 18px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            cursor: pointer;
+
+            background: #6b21a8;
+
+            color: white;
+
+            font-weight: bold;
+
+            transition:
+                all 0.25s ease;
+
+        }
+
+        #export-reading:hover,
+
+        #import-reading:hover {
+
+            transform:
+                translateY(-2px);
+
+            box-shadow:
+                0 8px 20px rgba(107, 33, 168, 0.25);
+
+        }
     </style>
 
 </head>
@@ -721,6 +762,24 @@
     <h2>档案统计</h2>
 
     <div id="archive-stats">
+    </div>
+
+    <div id="reading-backup">
+
+        <button id="export-reading">
+
+            📥 导出阅读档案
+
+        </button>
+
+        <button id="import-reading">
+
+            📤 导入阅读档案
+
+        </button>
+
+        <input type="file" id="import-file" accept=".json" style="display:none">
+
     </div>
 
     <script>
@@ -873,6 +932,45 @@
 
                     : 0;
 
+                let readerLevel;
+
+                if (percent < 5) {
+
+                    readerLevel =
+                        "初入馆";
+
+                } else if (percent < 15) {
+
+                    readerLevel =
+                        "文献浏览者";
+
+                } else if (percent < 30) {
+
+                    readerLevel =
+                        "文献探索者";
+
+                } else if (percent < 50) {
+
+                    readerLevel =
+                        "档案研究员";
+
+                } else if (percent < 70) {
+
+                    readerLevel =
+                        "馆藏学者";
+
+                } else if (percent < 90) {
+
+                    readerLevel =
+                        "档案守护者";
+
+                } else {
+
+                    readerLevel =
+                        "全馆通读";
+
+                }
+
                 document.getElementById(
                     "archive-stats"
                 ).innerHTML = `
@@ -902,6 +1000,11 @@
         <li>
             阅读进度：
             ${percent}%
+        </li>
+
+        <li>
+            阅读阶段：
+            ${readerLevel}
         </li>
 
     </ul>
@@ -1415,6 +1518,248 @@ ${unreadArticles.length}
             }
 
         }
+
+        /* ===== 导出阅读档案 ===== */
+
+        document.getElementById(
+            "export-reading"
+        ).addEventListener(
+
+            "click",
+
+            () => {
+
+                const archive = JSON.parse(
+
+                    localStorage.getItem(
+                        "readingArchive"
+                    ) || "[]"
+
+                );
+
+                if (archive.length === 0) {
+
+                    const confirmed = confirm(
+
+                        "当前没有阅读记录。\n\n仍然导出空白档案吗？"
+
+                    );
+
+                    if (!confirmed) {
+
+                        return;
+
+                    }
+
+                }
+
+                const backup = {
+
+                    version: "1.0",
+
+                    exportDate:
+
+                        new Date()
+
+                            .toISOString()
+
+                            .slice(0, 10),
+
+                    readingArchive:
+
+                        JSON.parse(
+
+                            localStorage.getItem(
+                                "readingArchive"
+                            ) || "[]"
+
+                        ),
+
+                    readingHistory:
+
+                        JSON.parse(
+
+                            localStorage.getItem(
+                                "readingHistory"
+                            ) || "[]"
+
+                        )
+
+                };
+
+                const blob =
+
+                    new Blob(
+
+                        [
+                            JSON.stringify(
+                                backup,
+                                null,
+                                2
+                            )
+                        ],
+
+                        {
+                            type:
+                                "application/json"
+                        }
+
+                    );
+
+                const url =
+
+                    URL.createObjectURL(
+                        blob
+                    );
+
+                const a =
+
+                    document.createElement(
+                        "a"
+                    );
+
+                a.href = url;
+
+                a.download =
+
+                    `tengkong-reading-backup-${backup.exportDate}.json`;
+
+                a.click();
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+            }
+
+        );
+
+        /* ===== 导入阅读档案 ===== */
+
+        document.getElementById(
+            "import-reading"
+        ).addEventListener(
+
+            "click",
+
+            () => {
+
+                document.getElementById(
+                    "import-file"
+                ).click();
+
+            }
+
+        );
+
+        document.getElementById(
+            "import-file"
+        ).addEventListener(
+
+            "change",
+
+            event => {
+
+                const file =
+                    event.target.files[0];
+
+                if (!file) {
+
+                    return;
+
+                }
+
+                const reader =
+                    new FileReader();
+
+                reader.onload =
+                    e => {
+
+                        try {
+
+                            const backup =
+
+                                JSON.parse(
+                                    e.target.result
+                                );
+
+                            if (
+
+                                !backup.readingArchive ||
+
+                                !backup.readingHistory
+
+                            ) {
+
+                                alert(
+                                    "不是有效的阅读档案文件。"
+                                );
+
+                                return;
+
+                            }
+
+                            const confirmed =
+
+                                confirm(
+
+                                    "导入将覆盖当前阅读记录。\n\n是否继续？"
+
+                                );
+
+                            if (!confirmed) {
+
+                                return;
+
+                            }
+
+                            localStorage.setItem(
+
+                                "readingArchive",
+
+                                JSON.stringify(
+                                    backup.readingArchive
+                                )
+
+                            );
+
+                            localStorage.setItem(
+
+                                "readingHistory",
+
+                                JSON.stringify(
+                                    backup.readingHistory
+                                )
+
+                            );
+
+                            alert(
+
+                                `阅读档案恢复成功！\n\n已恢复 ${backup.readingArchive.length} 篇阅读记录。`
+
+                            );
+
+                            location.reload();
+
+                        } catch (error) {
+
+                            alert(
+
+                                "文件读取失败。"
+
+                            );
+
+                        }
+
+                    };
+
+                reader.readAsText(
+                    file
+                );
+
+            }
+
+        );
     </script>
 </body>
 
