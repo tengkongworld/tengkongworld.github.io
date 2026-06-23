@@ -664,6 +664,60 @@
                 0 8px 20px rgba(107, 33, 168, 0.25);
 
         }
+
+        #search-input {
+
+            width: 100%;
+
+            max-width: 500px;
+
+            padding: 12px;
+
+            font-size: 16px;
+
+            border: 1px solid #ccc;
+
+            border-radius: 8px;
+
+            box-sizing: border-box;
+
+        }
+
+        .search-bar {
+
+            display: flex;
+
+            gap: 10px;
+
+            align-items: center;
+
+        }
+
+        #clear-search {
+
+            padding: 12px 18px;
+
+            border: none;
+
+            border-radius: 8px;
+
+            cursor: pointer;
+
+        }
+
+        #search-results ul {
+
+            list-style: none;
+
+            padding-left: 0;
+
+        }
+
+        #search-results li {
+
+            margin-bottom: 15px;
+
+        }
     </style>
 
 </head>
@@ -705,6 +759,28 @@
 
     </div>
 
+    <div id="archive-search">
+
+        <h2>
+            🔍 搜索馆藏
+        </h2>
+
+        <div class="search-bar">
+
+            <input type="text" id="search-input" placeholder="输入关键词搜索标题...">
+
+            <button id="clear-search">
+
+                清空
+
+            </button>
+
+        </div>
+
+        <div id="search-results"></div>
+
+    </div>
+
     <div id="continue-reading">
     </div>
 
@@ -719,6 +795,8 @@
         </p>
 
     </div>
+
+    <div id="recent-additions"></div>
 
     <div id="random-explore">
 
@@ -1029,7 +1107,7 @@
         </li>
 
         <li>
-            阅读阶段：
+            阅读等级：
             ${readerLevel}
         </li>
 
@@ -1084,6 +1162,151 @@
                 ).innerHTML =
                     collectionsHtml;
 
+                /* ===== 搜索馆藏 ===== */
+
+                document.getElementById(
+                    "search-input"
+                ).addEventListener(
+
+                    "input",
+
+                    event => {
+
+                        const keyword =
+
+                            event.target.value
+                                .trim()
+                                .toLowerCase();
+
+                        const resultsBox =
+
+                            document.getElementById(
+                                "search-results"
+                            );
+
+                        if (!keyword) {
+
+                            resultsBox.innerHTML =
+                                "";
+
+                            return;
+
+                        }
+
+                        const results =
+
+                            data.filter(
+                                article =>
+
+                                    article.title
+                                        .toLowerCase()
+                                        .includes(
+                                            keyword
+                                        )
+                            )
+
+                                .slice(0, 20);
+
+                        let html =
+
+                            `<p>
+                找到
+                ${results.length}
+                条结果
+            </p>`;
+
+                        if (results.length === 0) {
+
+                            html +=
+
+                                `<p>
+                    没有找到相关文献。
+                </p>`;
+
+                        } else {
+
+                            html += "<ul>";
+
+                            results.forEach(
+                                article => {
+
+                                    let category = "未分类";
+
+                                    if (
+                                        article.labels &&
+                                        article.labels.length > 0
+                                    ) {
+
+                                        category =
+                                            article.labels[0];
+
+                                        if (
+                                            article.labels.length > 1
+                                        ) {
+
+                                            category +=
+                                                " · " +
+                                                article.labels[1];
+
+                                        }
+
+                                    }
+
+                                    html += `
+
+<li>
+
+<a href="articles/${article.filename}">
+
+${article.title}
+
+</a>
+
+<br>
+
+<small>
+
+${category}
+
+</small>
+
+</li>
+
+`;
+
+                                }
+                            );
+
+                            html += "</ul>";
+
+                        }
+
+                        resultsBox.innerHTML =
+                            html;
+
+                    }
+
+                );
+
+                document.getElementById(
+                    "clear-search"
+                ).addEventListener(
+
+                    "click",
+
+                    () => {
+
+                        document.getElementById(
+                            "search-input"
+                        ).value = "";
+
+                        document.getElementById(
+                            "search-results"
+                        ).innerHTML = "";
+
+                    }
+
+                );
 
                 /* ===== 今日推荐 ===== */
 
@@ -1211,6 +1434,105 @@
     </p>
 
 `;
+
+                /* ===== 最近入藏 ===== */
+
+                const recentArticles =
+
+                    [...data]
+
+                        .sort(
+
+                            (a, b) =>
+
+                                new Date(
+                                    b.published
+                                )
+
+                                -
+
+                                new Date(
+                                    a.published
+                                )
+
+                        )
+
+                        .slice(0, 5);
+
+                let recentHtml = `
+
+<h2>
+
+🆕 最近入藏
+
+</h2>
+
+<ul>
+
+`;
+
+                recentArticles.forEach(
+                    article => {
+
+                        let category = "未分类";
+
+                        if (
+                            article.labels &&
+                            article.labels.length > 0
+                        ) {
+
+                            category = article.labels[0];
+
+                            if (
+                                article.labels.length > 1
+                            ) {
+
+                                category +=
+                                    " · " +
+                                    article.labels[1];
+
+                            }
+
+                        }
+
+                        recentHtml += `
+
+<li>
+
+<a href="articles/${article.filename}">
+
+${article.title}
+
+</a>
+
+<br>
+
+<small>
+
+${category}
+
+</small>
+
+<br>
+
+<small>
+
+${article.published}
+
+</small>
+
+</li>
+
+`;
+
+                    }
+                );
+
+                recentHtml += "</ul>";
+
+                document.getElementById(
+                    "recent-additions"
+                ).innerHTML = recentHtml;
                 /* ===== 随机探索 ===== */
 
                 document.getElementById(
@@ -1390,6 +1712,8 @@ ${unreadArticles.length}
 </p>
 
 <p class="continue-level">
+
+    阅读等级：
 
     ${readerLevel}
 
