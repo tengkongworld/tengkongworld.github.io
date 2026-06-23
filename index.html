@@ -1193,6 +1193,117 @@
 
                         }
 
+                        /* ===== 专题搜索 ===== */
+
+                        const labelResults = [];
+
+                        data.forEach(
+
+                            article => {
+
+                                if (
+
+                                    !article.labels ||
+
+                                    !article.label_slugs
+
+                                ) {
+
+                                    return;
+
+                                }
+
+                                article.labels.forEach(
+
+                                    (label, index) => {
+
+                                        if (
+
+                                            label
+                                                .toLowerCase()
+                                                .includes(
+                                                    keyword
+                                                )
+
+                                        ) {
+
+                                            labelResults.push({
+
+                                                parent:
+
+                                                    article.labels[0],
+
+                                                label:
+
+                                                    label,
+
+                                                slug:
+
+                                                    article
+                                                        .label_slugs[
+                                                    index
+                                                    ]
+
+                                            });
+
+                                        }
+
+                                    }
+
+                                );
+
+                            }
+
+                        );
+
+                        const uniqueLabels =
+
+                            [...new Map(
+
+                                labelResults.map(
+
+                                    item => [
+
+                                        item.slug,
+
+                                        {
+
+                                            parent:
+
+                                                item.parent,
+
+                                            label:
+
+                                                item.label,
+
+                                            slug:
+
+                                                item.slug,
+
+                                            count:
+
+                                                data.filter(
+
+                                                    article =>
+
+                                                        article.labels &&
+
+                                                        article.labels.includes(
+
+                                                            item.label
+
+                                                        )
+
+                                                ).length
+
+                                        }
+
+                                    ]
+
+                                )
+
+                            ).values()];
+
                         const results =
 
                             data.filter(
@@ -1214,6 +1325,67 @@
                 ${results.length}
                 条结果
             </p>`;
+
+                        /* ===== 专题结果 ===== */
+
+                        if (
+
+                            uniqueLabels.length > 0
+
+                        ) {
+
+                            html += `
+
+<h3>
+
+📁 专题
+
+</h3>
+
+`;
+
+                            uniqueLabels.forEach(
+
+                                item => {
+
+                                    html += `
+
+<p>
+
+<a href="labels/${item.slug}.html">
+
+${item.parent === item.label
+
+                                            ? item.label
+
+                                            : item.parent +
+                                            " · " +
+                                            item.label
+                                        }
+
+</a>
+
+<br>
+
+<small>
+
+共
+
+${item.count}
+
+篇文献
+
+</small>
+
+</p>
+
+`;
+
+                                }
+
+                            );
+
+                        }
 
                         if (results.length === 0) {
 
