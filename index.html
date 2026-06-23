@@ -498,6 +498,24 @@
 
         }
 
+        .continue-progress {
+
+            color: #666;
+
+            margin-bottom: 8px;
+
+        }
+
+        .continue-level {
+
+            font-weight: bold;
+
+            color: #6b21a8;
+
+            margin-bottom: 20px;
+
+        }
+
         .continue-button {
 
             display: inline-block;
@@ -784,9 +802,49 @@
 
     <script>
 
+        function getReaderLevel(percent) {
+
+            if (percent < 5) {
+
+                return "初入馆";
+
+            } else if (percent < 15) {
+
+                return "文献浏览者";
+
+            } else if (percent < 30) {
+
+                return "文献探索者";
+
+            } else if (percent < 50) {
+
+                return "档案研究员";
+
+            } else if (percent < 70) {
+
+                return "馆藏学者";
+
+            } else if (percent < 90) {
+
+                return "档案守护者";
+
+            }
+
+            return "全馆通读";
+
+        }
+
         fetch('data/articles.json')
             .then(response => response.json())
             .then(data => {
+
+                localStorage.setItem(
+
+                    "articleCount",
+
+                    data.length
+
+                );
 
                 function getFirstImage(html) {
 
@@ -923,53 +981,21 @@
 
                     );
 
-                const percent = data.length > 0
+                const percent =
 
-                    ? Math.round(
-                        readCount * 100 /
-                        data.length
-                    )
+                    data.length > 0
 
-                    : 0;
+                        ? Math.round(
+                            readCount * 100 /
+                            data.length
+                        )
 
-                let readerLevel;
+                        : 0;
 
-                if (percent < 5) {
-
-                    readerLevel =
-                        "初入馆";
-
-                } else if (percent < 15) {
-
-                    readerLevel =
-                        "文献浏览者";
-
-                } else if (percent < 30) {
-
-                    readerLevel =
-                        "文献探索者";
-
-                } else if (percent < 50) {
-
-                    readerLevel =
-                        "档案研究员";
-
-                } else if (percent < 70) {
-
-                    readerLevel =
-                        "馆藏学者";
-
-                } else if (percent < 90) {
-
-                    readerLevel =
-                        "档案守护者";
-
-                } else {
-
-                    readerLevel =
-                        "全馆通读";
-
-                }
+                const readerLevel =
+                    getReaderLevel(
+                        percent
+                    );
 
                 document.getElementById(
                     "archive-stats"
@@ -1057,6 +1083,7 @@
                     "collections"
                 ).innerHTML =
                     collectionsHtml;
+
 
                 /* ===== 今日推荐 ===== */
 
@@ -1297,6 +1324,41 @@ ${unreadArticles.length}
 
             const lastArticle = history[0];
 
+            const archive = JSON.parse(
+
+                localStorage.getItem(
+                    "readingArchive"
+                ) || "[]"
+
+            );
+
+            const readCount =
+                archive.length;
+
+            const totalCount = Number(
+
+                localStorage.getItem(
+                    "articleCount"
+                ) || 0
+
+            );
+
+            const percent =
+
+                totalCount > 0
+
+                    ? Math.round(
+                        readCount * 100 /
+                        totalCount
+                    )
+
+                    : 0;
+
+            const readerLevel =
+                getReaderLevel(
+                    percent
+                );
+
             document.getElementById(
                 "continue-reading"
             ).innerHTML = `
@@ -1318,6 +1380,20 @@ ${unreadArticles.length}
     ${lastArticle.title}
 
 </div>
+
+<p class="continue-progress">
+
+    阅读进度：
+
+    ${percent}%
+
+</p>
+
+<p class="continue-level">
+
+    ${readerLevel}
+
+</p>
 
 <p>
 
