@@ -337,6 +337,60 @@ def generate_label_pages(articles):
     <meta name="viewport"
           content="width=device-width, initial-scale=1">
     <title>{label}</title>
+
+    <style>
+
+    #gallery-view {{
+
+        display: grid;
+
+        grid-template-columns:
+
+            repeat(
+
+                auto-fill,
+
+                minmax(
+
+                    220px,
+
+                    1fr
+
+                )
+
+            );
+
+        gap: 16px;
+
+    }}
+
+    .gallery-card {{
+
+        border: 1px solid #ddd;
+
+        border-radius: 8px;
+
+        overflow: hidden;
+
+    }}
+
+    .gallery-card img {{
+
+        width: 100%;
+
+        display: block;
+
+    }}
+
+    .gallery-card p {{
+
+        padding: 10px;
+
+        font-weight: bold;
+
+    }}
+
+    </style>
 </head>
 <body>
 """)
@@ -436,6 +490,88 @@ def generate_label_pages(articles):
 
 <script>
 
+function showListMode() {
+
+    document.getElementById(
+        "article-list"
+    ).style.display = "block";
+
+    document.getElementById(
+        "gallery-view"
+    ).style.display = "none";
+
+}
+
+function rebuildGallery() {
+
+    const gallery =
+        document.getElementById(
+            "gallery-view"
+        );
+
+    gallery.innerHTML = "";
+
+    const galleryItems =
+        document.querySelectorAll(
+            "#article-list li"
+        );
+
+    galleryItems.forEach(item => {
+
+        const image =
+            item.dataset.image;
+
+        const title =
+            item.dataset.title;
+
+        const link =
+            item.querySelector(
+                "a"
+            ).href;
+
+        gallery.innerHTML += `
+
+<div class="gallery-card">
+
+    <a href="${link}">
+
+        <img
+            src="${image}"
+            alt="${title}"
+        >
+
+        <p>
+            ${title}
+        </p>
+
+    </a>
+
+</div>
+
+`;
+
+    });
+
+}
+                                        
+function showGalleryMode() {
+
+    document.getElementById(
+        "article-list"
+    ).style.display = "none";
+
+    const gallery =
+        document.getElementById(
+            "gallery-view"
+        );
+
+    gallery.style.display =
+        "grid";
+
+    rebuildGallery();
+
+}
+                    
 function sortAsc() {
 
     const list =
@@ -468,7 +604,17 @@ function sortAsc() {
         "asc"
     );
 
-}
+    if (
+        document.getElementById(
+            "gallery-view"
+        ).style.display !== "none"
+    ) {
+
+        rebuildGallery();
+
+    }
+
+}                    
 
 function sortDesc() {
 
@@ -501,6 +647,15 @@ function sortDesc() {
         "sortOrder",
         "desc"
     );
+    if (
+    document.getElementById(
+        "gallery-view"
+    ).style.display !== "none"
+    ) {
+
+    rebuildGallery();
+
+    }                
 
 }
 
@@ -586,36 +741,6 @@ document.getElementById(
 
 `;
 
-if (nextArticle) {
-
-    const link =
-        nextArticle.querySelector(
-            "a"
-        );
-
-    document.getElementById(
-        "next-reading"
-    ).innerHTML = `
-
-        <p>
-
-            <strong>
-                建议继续阅读：
-            </strong>
-
-        </p>
-
-        <p>
-
-            <a href="${link.href}">
-                ${link.textContent}
-            </a>
-
-        </p>
-
-    `;
-
-}
 const savedOrder =
 
     localStorage.getItem(
