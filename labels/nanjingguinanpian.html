@@ -60,7 +60,10 @@
 
     </style>
 </head>
-<body>
+<body
+    data-default-view="list"
+    data-default-sort="asc"
+>
 <p><a href="../index.html">首页</a> / <a href="nanjing.html">难经</a> / 难经鬼难篇</p><h1>难经鬼难篇</h1>
 <div id="reading-progress">
 </div>
@@ -77,8 +80,21 @@
 
         <li
             data-index="0"
+            data-title="弥勒菩萨《难经》鬼难篇 第一百二十五难：鬼恨难 "
+            data-image="../assets/images/8281909983291933686-1.jpg"
+        >
+            <span class="read-mark">○</span>
+
+            <a href="../articles/2026-06-27-nanjingguinanpian-8281909983291933686.html">
+                弥勒菩萨《难经》鬼难篇 第一百二十五难：鬼恨难 
+            </a>
+
+        </li>
+        
+        <li
+            data-index="1"
             data-title="弥勒菩萨《难经》鬼难篇 第一百二十四难：鬼游世间难 "
-            data-image="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjpzXMinbijVP8N3Z8SDqjEGrdtgnjvXbhmkOHHf3O0vBLoQM4yiU0_IGNyU3norLGn8tpicvIJ0UggK8Wf6aiTX1jfTqPG482YDf_rCWrbt16TYpAAfXuXBO0A7K_a0G-NdH4GQDYJNRPu9qfELnmjqkTtCalda5BP4tAVSiaxYATEmf4GsnB_LD1EEw/s320/%E5%B0%8F%E5%9B%BE.jpg"
+            data-image="../assets/images/7968552138617476357-1.jpg"
         >
             <span class="read-mark">○</span>
 
@@ -92,7 +108,7 @@
 
 
 
-<script>
+<script>                                       
 
 function showListMode() {
 
@@ -103,6 +119,11 @@ function showListMode() {
     document.getElementById(
         "gallery-view"
     ).style.display = "none";
+
+    localStorage.setItem(
+        "viewMode",
+        "list"
+    );
 
 }
 
@@ -173,6 +194,11 @@ function showGalleryMode() {
         "grid";
 
     rebuildGallery();
+
+    localStorage.setItem(
+        "viewMode",
+        "gallery"
+    );
 
 }
                     
@@ -263,109 +289,220 @@ function sortDesc() {
 
 }
 
-const history = JSON.parse(
+function initializeReadingHistory() {
 
-    localStorage.getItem(
-        "readingHistory"
-    ) || "[]"
+    const history = JSON.parse(
 
-);            
-                    
-const readTitles = history.map(
+        localStorage.getItem(
 
-    item => item.title
+            "readingHistory"
 
-);
+        ) || "[]"
 
-document
-    .querySelectorAll(
-        "li[data-title]"
-    )
-    .forEach(li => {
+    );
 
-        const title =
-            li.dataset.title;
+    const readTitles = history.map(
+
+        item => item.title
+
+    );
+
+    document
+
+        .querySelectorAll(
+
+            "li[data-title]"
+
+        )
+
+        .forEach(li => {
+
+            const title =
+
+                li.dataset.title;
+
+            if (
+
+                readTitles.includes(title)
+
+            ) {
+
+                li.querySelector(
+
+                    ".read-mark"
+
+                ).textContent = "✓";
+
+            }
+
+        });
+
+    const totalArticles = document
+
+        .querySelectorAll(
+
+            "li[data-title]"
+
+        ).length;
+
+    const readCount = document
+
+        .querySelectorAll(
+
+            ".read-mark"
+
+        );
+
+    let finished = 0;
+
+    readCount.forEach(mark => {
 
         if (
-            readTitles.includes(title)
+
+            mark.textContent === "✓"
+
         ) {
 
-            li.querySelector(
-                ".read-mark"
-            ).textContent = "✓";
+            finished++;
 
         }
 
-    });   
-const totalArticles = document
-    .querySelectorAll(
-        "li[data-title]"
-    ).length;
+    });
 
-const readCount = document
-    .querySelectorAll(
-        ".read-mark"
+    const percent = Math.round(
+
+        finished * 100 / totalArticles
+
     );
 
-let finished = 0;
+    document.getElementById(
 
-readCount.forEach(mark => {
+        "reading-progress"
 
-    if (
-        mark.textContent === "✓"
-    ) {
+    ).innerHTML = `
 
-        finished++;
+        <p>
 
-    }
+            已阅读：
 
-});
+            ${finished}
 
-const percent = Math.round(
+            /
 
-    finished * 100 / totalArticles
+            ${totalArticles}
 
-);
+            (${percent}%)
 
-document.getElementById(
-    "reading-progress"
-).innerHTML = `
+        </p>
 
-    <p>
-
-        已阅读：
-
-        ${finished}
-        /
-        ${totalArticles}
-
-        (${percent}%)
-
-    </p>
-
-`;
-
-const savedOrder =
-
-    localStorage.getItem(
-        "sortOrder"
-    );
-
-if (
-    savedOrder === "asc"
-) {
-
-    sortAsc();
+    `;
 
 }
 
-if (
-    savedOrder === "desc"
-) {
+function initializeSort() {
 
-    sortDesc();
+    const savedOrder =
 
-}                                                                 
+        localStorage.getItem(
+            "sortOrder"
+        );
+
+    if (
+        savedOrder === "asc"
+    ) {
+
+        sortAsc();
+
+        return;
+
+    }
+
+    if (
+        savedOrder === "desc"
+    ) {
+
+        sortDesc();
+
+        return;
+
+    }
+
+    const defaultSort =
+
+        document.body.dataset.defaultSort;
+
+    if (
+        defaultSort === "desc"
+    ) {
+
+        sortDesc();
+
+    } else {
+
+        sortAsc();
+
+    }
+
+}
+                    
+                    function initializeView() {
+
+    const savedView =
+
+        localStorage.getItem(
+            "viewMode"
+        );
+
+    if (
+        savedView === "gallery"
+    ) {
+
+        showGalleryMode();
+
+        return;
+
+    }
+
+    if (
+        savedView === "list"
+    ) {
+
+        showListMode();
+
+        return;
+
+    }
+
+    const defaultView =
+
+        document.body.dataset.defaultView;
+
+    if (
+        defaultView === "gallery"
+    ) {
+
+        showGalleryMode();
+
+    } else {
+
+        showListMode();
+
+    }
+
+}
+
+function initializePage() {
+
+    initializeReadingHistory();
+
+    initializeSort();
+
+    initializeView();
+
+}
+
+initializePage();
+                                                                                                  
 </script>
 
 </body>
