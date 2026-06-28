@@ -912,9 +912,13 @@
 
         }
 
-        fetch('data/articles.json')
-            .then(response => response.json())
-            .then(data => {
+        Promise.all([
+            fetch('data/articles.json')
+                .then(response => response.json()),
+            fetch('data/homepage.json')
+                .then(response => response.json())
+        ])
+            .then(([data, collections]) => {
 
                 localStorage.setItem(
 
@@ -953,46 +957,6 @@
 
                 const labels = {};
                 const labelSlugs = {};
-
-                const collections = [
-
-                    {
-                        title: "难经",
-                        image: "images/nanjing.jpg",
-                        description: "弥勒菩萨《难经》系列",
-                        url: "labels/nanjing.html",
-
-                        label: "难经"
-                    },
-
-                    {
-                        title: "心经",
-                        image: "images/xinjing.jpg",
-                        description: "《心经》佛界之解",
-                        url: "labels/xinjing.html",
-
-                        label: "《心经》佛界之解1"
-                    },
-
-                    {
-                        title: "道德经",
-                        image: "images/daodejing.jpg",
-                        description: "老子再传《道德经》佛界版",
-                        url: "labels/daodejingfujieban.html",
-
-                        label: "《道德经》佛界版"
-                    },
-
-                    {
-                        title: "外星人",
-                        image: "images/waixingren.jpg",
-                        description: "腾空看到的外星人系列",
-                        url: "labels/tengkongkandaodewaixingren.html",
-
-                        label: "腾空看到的外星人"
-                    }
-
-                ];
 
                 data.forEach(article => {
 
