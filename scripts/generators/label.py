@@ -9,8 +9,56 @@ def generate_label_pages(
     make_slug,
     get_article_image_path,
     build_article_filename,
+    output_dir="labels",
+    asset_prefix="..",
+    article_prefix="../articles",
+    language="zh-cn",
 ):
-    os.makedirs("labels", exist_ok=True)
+
+    if language == "zh-tw":
+        TEXT = {
+            "home": "首頁",
+            "mode": "模式",
+            "standard": "標準",
+            "eye": "護眼",
+            "night": "夜間",
+            "classic": "古籍",
+            "font": "字級",
+            "sort": "排序",
+            "ascending": "由舊到新",
+            "descending": "由新到舊",
+            "asc_button": "正序",
+            "desc_button": "倒序",
+            "list": "列表",
+            "gallery": "圖鑑",
+            "read": "已閱讀",
+        }
+        html_lang = "zh-TW"
+
+    else:
+        TEXT = {
+            "home": "首页",
+            "mode": "模式",
+            "standard": "标准",
+            "eye": "护眼",
+            "night": "夜间",
+            "classic": "古籍",
+            "font": "字号",
+            "sort": "排序",
+            "ascending": "升序",
+            "descending": "降序",
+            "asc_button": "正序",
+            "desc_button": "倒序",
+            "list": "列表",
+            "gallery": "图鉴",
+            "read": "已阅读",
+        }
+        html_lang = "zh-CN"
+
+    os.makedirs(output_dir, exist_ok=True)
+    gallery_label_slugs = {
+        make_slug(gallery_label): gallery_label for gallery_label in gallery_labels
+    }
     label_articles = {}
     for article in articles:
         for label in article["labels"]:
@@ -18,20 +66,63 @@ def generate_label_pages(
                 label_articles[label] = []
             label_articles[label].append(article)
     for label, articles_list in label_articles.items():
-        has_gallery = label in gallery_labels
-        default_view = get_collection_default_view(label)
-        default_sort = get_collection_default_sort(label)
+        collection_label = label
+        label_slug = make_slug(label)
 
-        filepath = f"labels/{make_slug(label)}.html"
+        if label not in gallery_labels and label_slug in gallery_label_slugs:
+            collection_label = gallery_label_slugs[label_slug]
+
+        has_gallery = collection_label in gallery_labels
+        default_view = get_collection_default_view(collection_label)
+        default_sort = get_collection_default_sort(collection_label)
+
+        filename = f"{make_slug(label)}.html"
+        filepath = os.path.join(output_dir, filename)
+
+        if language == "zh-tw":
+            language_switcher = f"""
+<div class="language-switcher">
+    <a href="../../labels/{filename}">简体中文</a>
+    ｜
+    <span class="current-language">繁體中文</span>
+</div>
+"""
+            alternate_links = f"""
+    <link rel="alternate" hreflang="zh-CN" href="../../labels/{filename}">
+    <link rel="alternate" hreflang="zh-TW" href="{filename}">
+"""
+
+        else:
+            language_switcher = f"""
+<div class="language-switcher">
+    <span class="current-language">简体中文</span>
+    ｜
+    <a href="../tc/labels/{filename}">繁體中文</a>
+</div>
+"""
+            alternate_links = f"""
+    <link rel="alternate" hreflang="zh-CN" href="{filename}">
+    <link rel="alternate" hreflang="zh-TW" href="../tc/labels/{filename}">
+"""
 
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(f"""<!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="{html_lang}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport"
           content="width=device-width, initial-scale=1">
     <title>{label}</title>
+
+{alternate_links}
+
+    <link
+    rel="stylesheet"
+    href="{asset_prefix}/assets/css/theme.css">
+
+<link
+    rel="stylesheet"
+    href="{asset_prefix}/assets/css/article.css">
 
     <style>
 
@@ -91,6 +182,7 @@ def generate_label_pages(
     data-default-view="{default_view}"
     data-default-sort="{default_sort}"
 >
+{language_switcher}
 """)
 
             parent_label = ""
@@ -104,10 +196,10 @@ def generate_label_pages(
             if parent_label:
                 f.write(
                     f"<p>"
-                    f'<a href="../index.html">'
-                    f"首页"
+                    f'<a href="{asset_prefix}/index.html">'
+                    f"{TEXT['home']}"
                     f"</a> / "
-                    f'<a href="{make_slug(parent_label)}.html">'
+                    f'<a href="{asset_prefix}/labels/{make_slug(parent_label)}.html">'
                     f"{parent_label}"
                     f"</a> / "
                     f"{label}"
@@ -115,7 +207,9 @@ def generate_label_pages(
                 )
 
             else:
-                f.write(f'<p><a href="../index.html">首页</a> / {label}</p>')
+                f.write(
+                    f'<p><a href="{asset_prefix}/index.html">{TEXT["home"]}</a> / {label}</p>'
+                )
 
             f.write(f"<h1>{label}</h1>")
 
@@ -127,28 +221,30 @@ def generate_label_pages(
 </div>
 """)
             if has_gallery:
-                f.write("""
+                f.write(f"""
 <p>
-<button onclick="sortAsc()">正序</button>
-<button onclick="sortDesc()">倒序</button>
+<button onclick="sortAsc()">{TEXT["ascending"]}</button>
+<button onclick="sortDesc()">{TEXT["descending"]}</button>
 </p>
 
 <p>
-<button onclick="showListMode()">📄 列表模式</button>
-<button onclick="showGalleryMode()">🖼 图鉴模式</button>
+<button onclick="showListMode()">📄 {TEXT["list"]}</button>
+<button onclick="showGalleryMode()">🖼 {TEXT["gallery"]}</button>
 </p>
 """)
 
             else:
-                f.write("""
+                f.write(f"""
 <p>
-<button onclick="sortAsc()">正序</button>
-<button onclick="sortDesc()">倒序</button>
+<button onclick="sortAsc()">{TEXT["asc_button"]}</button>
+<button onclick="sortDesc()">{TEXT["desc_button"]}</button>
 </p>
 """)
 
             f.write("""
-<ul id="article-list">
+<ul
+    id="article-list"
+    class="article-list">
 """)
 
             for index, article in enumerate(articles_list):
@@ -157,11 +253,11 @@ def generate_label_pages(
         <li
             data-index="{index}"
             data-title="{article["title"]}"
-            data-image="{get_article_image_path(article, 1)}"
+            data-image="{get_article_image_path(article, 1, prefix=asset_prefix)}"
         >
             <span class="read-mark">○</span>
 
-            <a href="../articles/{build_article_filename(article)}">
+            <a href="{article_prefix}/{build_article_filename(article)}">
                 {article["title"]}
             </a>
 
@@ -184,8 +280,9 @@ def generate_label_pages(
 
 """)
 
-            f.write("""
-
+            f.write(
+                """             
+                                                            
 <script>                                       
 
 function showListMode() {
@@ -455,25 +552,169 @@ function initializeReadingHistory() {
 
     document.getElementById(
 
-        "reading-progress"
+    "reading-progress"
 
-    ).innerHTML = `
+).innerHTML = `
 
-        <p>
+    <p>
 
-            已阅读：
+        __READ_TEXT__
 
-            ${finished}
+        ${finished}
 
-            /
+        /
 
-            ${totalArticles}
+        ${totalArticles}
 
-            (${percent}%)
+        (${percent}%)
 
-        </p>
+    </p>
 
-    `;
+    <div class="reading-options">
+
+        <div class="reading-options-group">
+
+            <span class="reading-label">
+
+                __MODE_TEXT__
+
+            </span>
+
+            <div class="reading-buttons">
+
+                <button class="theme-button" data-theme="default">
+
+                    __STANDARD_TEXT__
+
+                </button>
+
+                <button class="theme-button" data-theme="eye">
+
+                    __EYE_TEXT__
+
+                </button>
+
+                <button class="theme-button" data-theme="dark">
+
+                    __NIGHT_TEXT__
+
+                </button>
+
+                <button class="theme-button" data-theme="classic">
+
+                    __CLASSIC_TEXT__
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="reading-options-group">
+
+            <span class="reading-label">
+
+                __FONT_TEXT__
+
+            </span>
+
+            <div class="font-buttons">
+
+                <button id="font-smaller">
+
+                    A－
+
+                </button>
+
+                <span id="font-size">
+
+                    18
+
+                </span>
+
+                <button id="font-larger">
+
+                    A＋
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <hr>
+
+`;
+                    
+document
+
+    .querySelectorAll(".theme-button")
+
+    .forEach(button => {
+
+        button.addEventListener(
+
+            "click",
+
+            () => {
+
+                setTheme(
+
+                    button.dataset.theme
+
+                );
+
+            }
+
+        );
+
+    });
+
+const smaller = document.getElementById("font-smaller");
+
+const larger = document.getElementById("font-larger");
+
+if (smaller) {
+
+    smaller.onclick = () => {
+
+        let size = parseInt(
+
+            localStorage.getItem("fontSize")
+
+        ) || DEFAULT_FONT_SIZE;
+
+        if (size > MIN_FONT_SIZE) {
+
+            applyFontSize(size - 1);
+
+        }
+
+    };
+
+}
+
+if (larger) {
+
+    larger.onclick = () => {
+
+        let size = parseInt(
+
+            localStorage.getItem("fontSize")
+
+        ) || DEFAULT_FONT_SIZE;
+
+        if (size < MAX_FONT_SIZE) {
+
+            applyFontSize(size + 1);
+
+        }
+
+    };
+
+}                  
 
 }
 
@@ -573,16 +814,36 @@ function initializePage() {
 
     initializeReadingHistory();
 
+    initializeTheme();
+
+    initializeFontSize();
+
     initializeSort();
 
     initializeView();
 
 }
+                                                                                                  
+</script>
+                    
+<script src="__ASSET_PREFIX__/assets/js/theme.js"></script>
+
+<script src="__ASSET_PREFIX__/assets/js/article.js"></script>
+
+<script>
 
 initializePage();
-                                                                                                  
+
 </script>
 
 </body>
 </html>
-""")
+""".replace("__ASSET_PREFIX__", asset_prefix)
+                .replace("__READ_TEXT__", TEXT["read"])
+                .replace("__MODE_TEXT__", TEXT["mode"])
+                .replace("__STANDARD_TEXT__", TEXT["standard"])
+                .replace("__EYE_TEXT__", TEXT["eye"])
+                .replace("__NIGHT_TEXT__", TEXT["night"])
+                .replace("__CLASSIC_TEXT__", TEXT["classic"])
+                .replace("__FONT_TEXT__", TEXT["font"])
+            )

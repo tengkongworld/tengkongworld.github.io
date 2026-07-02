@@ -6,6 +6,19 @@
           content="width=device-width, initial-scale=1">
     <title>难经神难篇</title>
 
+
+    <link rel="alternate" hreflang="zh-CN" href="nanjingshennanpian.html">
+    <link rel="alternate" hreflang="zh-TW" href="../tc/labels/nanjingshennanpian.html">
+
+
+    <link
+    rel="stylesheet"
+    href="../assets/css/theme.css">
+
+<link
+    rel="stylesheet"
+    href="../assets/css/article.css">
+
     <style>
 
     #gallery-view {
@@ -64,7 +77,14 @@
     data-default-view="list"
     data-default-sort="asc"
 >
-<p><a href="../index.html">首页</a> / <a href="nanjing.html">难经</a> / 难经神难篇</p><h1>难经神难篇</h1>
+
+<div class="language-switcher">
+    <span class="current-language">简体中文</span>
+    ｜
+    <a href="../tc/labels/nanjingshennanpian.html">繁體中文</a>
+</div>
+
+<p><a href="../index.html">首页</a> / <a href="../labels/nanjing.html">难经</a> / 难经神难篇</p><h1>难经神难篇</h1>
 <div id="reading-progress">
 </div>
 
@@ -76,7 +96,9 @@
 <button onclick="sortDesc()">倒序</button>
 </p>
 
-<ul id="article-list">
+<ul
+    id="article-list"
+    class="article-list">
 
         <li
             data-index="0"
@@ -561,8 +583,8 @@
         
     </ul>
 
-
-
+             
+                                                            
 <script>                                       
 
 function showListMode() {
@@ -832,25 +854,169 @@ function initializeReadingHistory() {
 
     document.getElementById(
 
-        "reading-progress"
+    "reading-progress"
 
-    ).innerHTML = `
+).innerHTML = `
 
-        <p>
+    <p>
 
-            已阅读：
+        已阅读
 
-            ${finished}
+        ${finished}
 
-            /
+        /
 
-            ${totalArticles}
+        ${totalArticles}
 
-            (${percent}%)
+        (${percent}%)
 
-        </p>
+    </p>
 
-    `;
+    <div class="reading-options">
+
+        <div class="reading-options-group">
+
+            <span class="reading-label">
+
+                模式
+
+            </span>
+
+            <div class="reading-buttons">
+
+                <button class="theme-button" data-theme="default">
+
+                    标准
+
+                </button>
+
+                <button class="theme-button" data-theme="eye">
+
+                    护眼
+
+                </button>
+
+                <button class="theme-button" data-theme="dark">
+
+                    夜间
+
+                </button>
+
+                <button class="theme-button" data-theme="classic">
+
+                    古籍
+
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="reading-options-group">
+
+            <span class="reading-label">
+
+                字号
+
+            </span>
+
+            <div class="font-buttons">
+
+                <button id="font-smaller">
+
+                    A－
+
+                </button>
+
+                <span id="font-size">
+
+                    18
+
+                </span>
+
+                <button id="font-larger">
+
+                    A＋
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <hr>
+
+`;
+                    
+document
+
+    .querySelectorAll(".theme-button")
+
+    .forEach(button => {
+
+        button.addEventListener(
+
+            "click",
+
+            () => {
+
+                setTheme(
+
+                    button.dataset.theme
+
+                );
+
+            }
+
+        );
+
+    });
+
+const smaller = document.getElementById("font-smaller");
+
+const larger = document.getElementById("font-larger");
+
+if (smaller) {
+
+    smaller.onclick = () => {
+
+        let size = parseInt(
+
+            localStorage.getItem("fontSize")
+
+        ) || DEFAULT_FONT_SIZE;
+
+        if (size > MIN_FONT_SIZE) {
+
+            applyFontSize(size - 1);
+
+        }
+
+    };
+
+}
+
+if (larger) {
+
+    larger.onclick = () => {
+
+        let size = parseInt(
+
+            localStorage.getItem("fontSize")
+
+        ) || DEFAULT_FONT_SIZE;
+
+        if (size < MAX_FONT_SIZE) {
+
+            applyFontSize(size + 1);
+
+        }
+
+    };
+
+}                  
 
 }
 
@@ -950,14 +1116,26 @@ function initializePage() {
 
     initializeReadingHistory();
 
+    initializeTheme();
+
+    initializeFontSize();
+
     initializeSort();
 
     initializeView();
 
 }
+                                                                                                  
+</script>
+                    
+<script src="../assets/js/theme.js"></script>
+
+<script src="../assets/js/article.js"></script>
+
+<script>
 
 initializePage();
-                                                                                                  
+
 </script>
 
 </body>

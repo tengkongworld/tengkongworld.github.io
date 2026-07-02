@@ -15,11 +15,12 @@ from config import (
 from feed import fetch_feed
 from generators.article import generate_html_files
 from generators.label import generate_label_pages
+from converters.opencc_converter import to_traditional
 
 import os
 from urllib.request import urlretrieve
 
-OUTPUT_FILE = "data/articles.json"
+OUTPUT_FILE = "data/articles_tc.json"
 
 print("开始同步 Blogger 档案...")
 
@@ -36,6 +37,32 @@ def get_first_image(html):
         return match.group(1)
 
     return ""
+
+
+import copy
+
+
+import copy
+
+
+def convert_articles(
+    articles,
+    converter,
+):
+    """
+    复制文章数据，并转换指定字段。
+    """
+
+    articles_new = copy.deepcopy(articles)
+
+    for article in articles_new:
+        article["title"] = converter(article["title"])
+
+        article["content"] = converter(article["content"])
+
+        article["labels"] = [converter(label) for label in article["labels"]]
+
+    return articles_new
 
 
 def get_article_image_filename(article, index):
@@ -162,6 +189,8 @@ for article in feed_articles:
 
 articles = list(articles_by_id.values())
 
+articles_tc = convert_articles(articles, to_traditional)
+
 
 # =========================
 # 排序
@@ -169,10 +198,20 @@ articles = list(articles_by_id.values())
 
 articles.sort(key=lambda x: x["published"], reverse=True)
 
+articles_tc.sort(key=lambda x: x["published"], reverse=True)
+
 for article in articles:
     article["filename"] = build_article_filename(article)
 
     # generate label slugs for each article
+    article["label_slugs"] = []
+
+    for label in article.get("labels", []):
+        article["label_slugs"].append(make_slug(label))
+
+for article in articles_tc:
+    article["filename"] = build_article_filename(article)
+
     article["label_slugs"] = []
 
     for label in article.get("labels", []):
@@ -186,6 +225,14 @@ os.makedirs("data", exist_ok=True)
 
 with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
     json.dump(articles, f, ensure_ascii=False, indent=2)
+
+with open("data/articles_tc.json", "w", encoding="utf-8") as f:
+    json.dump(
+        articles_tc,
+        f,
+        ensure_ascii=False,
+        indent=2,
+    )
 
 
 print()
@@ -214,11 +261,25 @@ test_articles.sort(key=lambda x: x["published"])
 for a in test_articles:
     print(a["published"], a["title"])
 
+# 简体
 generate_html_files(
     articles,
     make_slug,
     build_article_filename,
     get_article_image_path,
+    output_dir="articles",
+    asset_prefix="..",
+)
+
+# 繁体
+generate_html_files(
+    articles_tc,
+    make_slug,
+    build_article_filename,
+    get_article_image_path,
+    output_dir="tc/articles",
+    asset_prefix="../..",
+    language="zh-tw",
 )
 generate_label_pages(
     articles,
@@ -228,7 +289,24 @@ generate_label_pages(
     make_slug,
     get_article_image_path,
     build_article_filename,
+    output_dir="labels",
+    asset_prefix="..",
 )
+
+generate_label_pages(
+    articles_tc,
+    GALLERY_LABELS,
+    get_collection_default_view,
+    get_collection_default_sort,
+    make_slug,
+    get_article_image_path,
+    build_article_filename,
+    output_dir="tc/labels",
+    asset_prefix="../..",
+    article_prefix="../articles",
+    language="zh-tw",
+)
+
 download_images(articles)
 print()
 print("静态HTML数量:", len(articles))

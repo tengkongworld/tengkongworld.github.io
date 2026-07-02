@@ -7,9 +7,47 @@ def generate_html_files(
     make_slug,
     build_article_filename,
     get_article_image_path,
+    output_dir="articles",
+    asset_prefix="..",
+    label_prefix="../labels",
+    language="zh-cn",
 ):
 
-    os.makedirs("articles", exist_ok=True)
+    if language == "zh-tw":
+        TEXT = {
+            "home": "首頁",
+            "published": "發布日期",
+            "mode": "模式",
+            "standard": "標準",
+            "eye": "護眼",
+            "night": "夜間",
+            "classic": "古籍",
+            "font": "字級",
+            "read": "已閱讀",
+            "previous_next": "上一篇 / 下一篇",
+            "archive_id": "檔案編號",
+            "source": "來源",
+            "archive_name": "騰空世界觀檔案館",
+        }
+
+    else:
+        TEXT = {
+            "home": "首页",
+            "published": "发布日期",
+            "mode": "模式",
+            "standard": "标准",
+            "eye": "护眼",
+            "night": "夜间",
+            "classic": "古籍",
+            "font": "字号",
+            "read": "已阅读",
+            "previous_next": "上一篇 / 下一篇",
+            "archive_id": "档案编号",
+            "source": "来源",
+            "archive_name": "腾空世界观档案馆",
+        }
+
+    os.makedirs(output_dir, exist_ok=True)
 
     for article in articles:
         current_label = ""
@@ -38,24 +76,26 @@ def generate_html_files(
 
         filename = build_article_filename(article)
 
-        filepath = os.path.join("articles", filename)
+        filepath = os.path.join(output_dir, filename)
 
         label_links = []
 
         for label in article["labels"]:
             label_slug = make_slug(label)
 
-            label_links.append(f'<a href="../labels/{label_slug}.html">{label}</a>')
+            label_links.append(
+                f'<a href="{asset_prefix}/labels/{label_slug}.html">{label}</a>'
+            )
 
         labels_html = " / ".join(label_links)
 
-        breadcrumb_links = ['<a href="../index.html">首页</a>']
+        breadcrumb_links = [f'<a href="{asset_prefix}/index.html">{TEXT["home"]}</a>']
 
         for label in article["labels"]:
             label_slug = make_slug(label)
 
             breadcrumb_links.append(
-                f'<a href="../labels/{label_slug}.html">{label}</a>'
+                f'<a href="{label_prefix}/{label_slug}.html">{label}</a>'
             )
 
         back_to_label = f"""
@@ -66,12 +106,22 @@ def generate_html_files(
 
         content = article["content"]
 
+        # 删除 Blogger / Word 导出的字号样式，
+        # 统一由 article.css 和 article.js 控制字体大小。
+
+        content = re.sub(
+            r"font-size\s*:\s*[^;\"']+;?",
+            "",
+            content,
+            flags=re.IGNORECASE,
+        )
+
         imgs = re.findall(r'<img[^>]+src="([^"]+)"', content)
 
         local_images = {}
 
         for index, img_url in enumerate(imgs, start=1):
-            local_image = get_article_image_path(article, index)
+            local_image = get_article_image_path(article, index, prefix=asset_prefix)
 
             local_images[img_url] = local_image
 
@@ -86,7 +136,9 @@ def generate_html_files(
             local_image = local_images.get(href)
 
             if local_image is None and index <= len(imgs):
-                local_image = get_article_image_path(article, index)
+                local_image = get_article_image_path(
+                    article, index, prefix=asset_prefix
+                )
 
             if local_image:
                 content = content.replace(f'href="{href}"', f'href="{local_image}"')
@@ -109,8 +161,35 @@ def generate_html_files(
                 f"</a> →</p>"
             )
 
+        if language == "zh-tw":
+            html_lang = "zh-TW"
+            language_switcher = f"""
+<div class="language-switcher">
+    <a href="../../articles/{filename}">简体中文</a>
+    ｜
+    <span class="current-language">繁體中文</span>
+</div>
+"""
+            alternate_links = f"""
+<link rel="alternate" hreflang="zh-CN" href="../../articles/{filename}">
+<link rel="alternate" hreflang="zh-TW" href="{filename}">
+"""
+        else:
+            html_lang = "zh-CN"
+            language_switcher = f"""
+<div class="language-switcher">
+    <span class="current-language">简体中文</span>
+    ｜
+    <a href="../tc/articles/{filename}">繁體中文</a>
+</div>
+"""
+            alternate_links = f"""
+<link rel="alternate" hreflang="zh-CN" href="{filename}">
+<link rel="alternate" hreflang="zh-TW" href="../tc/articles/{filename}">
+"""
+
         html = f"""<!DOCTYPE html>
-<html lang="zh-CN">
+        <html lang="{html_lang}">
 
 <head>
 
@@ -121,28 +200,20 @@ content="width=device-width, initial-scale=1">
 
 <title>{article["title"]}</title>
 
-<style>
+{alternate_links}
 
-body{{
-    max-width:900px;
-    margin:auto;
-    padding:20px;
-    font-family:Arial, Helvetica, sans-serif;
-    line-height:1.8;
-}}
+<link rel="stylesheet"
+href="{asset_prefix}/assets/css/theme.css">
 
-img{{
-    max-width:100%;
-    height:auto;
-}}
-
-</style>
+<link
+    rel="stylesheet"
+    href="{asset_prefix}/assets/css/article.css">
 
 </head>
 
 <body>
 
-<body>
+{language_switcher}
 
 {back_to_label}
 
@@ -151,37 +222,96 @@ img{{
 </h1>
 
 <p>
-发布日期：
+{TEXT["published"]}：
 {article["published"]}
 </p>
 
+<div class="reading-options">
+
+    <div class="reading-options-group">
+
+        <span class="reading-label">
+            {TEXT["mode"]}
+        </span>
+
+        <div class="reading-buttons">
+
+            <button class="theme-button" data-theme="default">
+                {TEXT["standard"]}
+            </button>
+
+            <button class="theme-button" data-theme="eye">
+                {TEXT["eye"]}
+            </button>
+
+            <button class="theme-button" data-theme="dark">
+                {TEXT["night"]}
+            </button>
+
+            <button class="theme-button" data-theme="classic">
+                {TEXT["classic"]}
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="reading-options-group">
+
+        <span class="reading-label">
+            {TEXT["font"]}
+        </span>
+
+        <div class="font-buttons">
+
+            <button id="font-smaller">
+                A－
+            </button>
+
+            <span id="font-size">
+                18
+            </span>
+
+            <button id="font-larger">
+                A＋
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 <hr>
+
+<div class="article-content">
 
 {content}
 
+</div>
+
 <hr>
 
-<h3>上一篇 / 下一篇</h3>
+<h3>{TEXT["previous_next"]}</h3>
 
 {navigation_html}
 
 <hr>
 
 <p>
-档案编号：
+{TEXT["archive_id"]}：
 {article["id"]}
 </p>
 
 <p>
-来源：
-腾空世界观档案馆
+{TEXT["source"]}：
+{TEXT["archive_name"]}
 </p>
 
 <script>
 
-const currentArticle = {{
-
-    title: "{article["title"]}",
+window.currentArticle = {{
+            title: "{article["title"]}",
 
     url: window.location.pathname,
 
@@ -189,78 +319,11 @@ const currentArticle = {{
 
 }};
 
-
-
-/* 最近阅读 */
-
-let history = JSON.parse(
-
-    localStorage.getItem(
-        "readingHistory"
-    ) || "[]"
-
-);
-
-history = history.filter(
-
-    item => item.url !== currentArticle.url
-
-);
-
-history.unshift(
-    currentArticle
-);
-
-history = history.slice(
-    0,
-    10
-);
-
-localStorage.setItem(
-
-    "readingHistory",
-
-    JSON.stringify(history)
-
-);
-
-
-
-/* 累计阅读 */
-
-let archive = JSON.parse(
-
-    localStorage.getItem(
-        "readingArchive"
-    ) || "[]"
-
-);
-
-if (
-
-    !archive.includes(
-        currentArticle.url
-    )
-
-) {{
-
-    archive.push(
-        currentArticle.url
-    );
-
-    localStorage.setItem(
-
-        "readingArchive",
-
-        JSON.stringify(
-            archive
-        )
-
-    );
-
-}}
-
 </script>
+
+<script src="{asset_prefix}/assets/js/theme.js"></script>
+
+<script src="{asset_prefix}/assets/js/article.js"></script>
 
 </body>
 
