@@ -196,10 +196,10 @@ def generate_label_pages(
             if parent_label:
                 f.write(
                     f"<p>"
-                    f'<a href="{asset_prefix}/index.html">'
+                    f'<a href="../index.html">'
                     f"{TEXT['home']}"
                     f"</a> / "
-                    f'<a href="{asset_prefix}/labels/{make_slug(parent_label)}.html">'
+                    f'<a href="{make_slug(parent_label)}.html">'
                     f"{parent_label}"
                     f"</a> / "
                     f"{label}"
@@ -208,7 +208,7 @@ def generate_label_pages(
 
             else:
                 f.write(
-                    f'<p><a href="{asset_prefix}/index.html">{TEXT["home"]}</a> / {label}</p>'
+                    f'<p><a href="../index.html">{TEXT["home"]}</a> / {label}</p>'
                 )
 
             f.write(f"<h1>{label}</h1>")

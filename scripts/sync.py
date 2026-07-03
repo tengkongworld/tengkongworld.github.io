@@ -20,7 +20,7 @@ from converters.opencc_converter import to_traditional
 import os
 from urllib.request import urlretrieve
 
-OUTPUT_FILE = "data/articles_tc.json"
+OUTPUT_FILE = "data/articles.json"
 
 print("开始同步 Blogger 档案...")
 
@@ -37,9 +37,6 @@ def get_first_image(html):
         return match.group(1)
 
     return ""
-
-
-import copy
 
 
 import copy
@@ -73,6 +70,11 @@ def get_article_image_filename(article, index):
 def get_article_image_path(article, index, prefix=".."):
     """Return the local web path for an article image."""
     return f"{prefix}/assets/images/{get_article_image_filename(article, index)}"
+
+
+def get_article_data_image_path(article, index):
+    """Return the site-root-relative image path stored in JSON data."""
+    return f"assets/images/{get_article_image_filename(article, index)}"
 
 
 def make_slug(text):
@@ -200,8 +202,23 @@ articles.sort(key=lambda x: x["published"], reverse=True)
 
 articles_tc.sort(key=lambda x: x["published"], reverse=True)
 
+for article in articles_tc:
+    imgs = re.findall(r'<img[^>]+src="([^"]+)"', article["content"])
+
+    if imgs:
+        article["image"] = get_article_data_image_path(article, 1)
+    else:
+        article["image"] = ""
+
 for article in articles:
     article["filename"] = build_article_filename(article)
+
+    imgs = re.findall(r'<img[^>]+src="([^"]+)"', article["content"])
+
+    if imgs:
+        article["image"] = get_article_data_image_path(article, 1)
+    else:
+        article["image"] = ""
 
     # generate label slugs for each article
     article["label_slugs"] = []

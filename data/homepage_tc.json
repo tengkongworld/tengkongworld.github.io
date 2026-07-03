@@ -3,28 +3,28 @@
         "title": "彌勒菩薩《難經》系列",
         "image": "images/nanjing.jpg",
         "description": "全書600餘章，目前正在更新中。目前更新的篇章包括《難經》人間難篇、世間難篇、神難篇、心神難篇、鬼難篇",
-        "url": "tc/labels/nanjing.html",
+        "url": "labels/nanjing.html",
         "label": "難經"
     },
     {
         "title": "《心經》佛界之解",
         "image": "images/xinjing.jpg",
         "description": "目前正在更新《心經》佛界之解1",
-        "url": "tc/labels/xinjingfujiezhijie.html",
+        "url": "labels/xinjingfujiezhijie.html",
         "label": "《心經》佛界之解1"
     },
     {
         "title": "老子再傳《道德經》佛界版",
         "image": "images/daodejing.jpg",
         "description": "全書81章，目前正在更新中",
-        "url": "tc/labels/daodejingfujieban.html",
+        "url": "labels/daodejingfujieban.html",
         "label": "《道德經》佛界版"
     },
     {
         "title": "騰空看到的外星人",
         "image": "images/waixingren.jpg",
         "description": "第一部25章，目前已經更新完成",
-        "url": "tc/labels/tengkongkandaodewaixingren.html",
+        "url": "labels/tengkongkandaodewaixingren.html",
         "label": "騰空看到的外星人"
     }
 ]

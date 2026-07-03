@@ -89,7 +89,7 @@ def generate_html_files(
 
         labels_html = " / ".join(label_links)
 
-        breadcrumb_links = [f'<a href="{asset_prefix}/index.html">{TEXT["home"]}</a>']
+        breadcrumb_links = [f'<a href="../index.html">{TEXT["home"]}</a>']
 
         for label in article["labels"]:
             label_slug = make_slug(label)
